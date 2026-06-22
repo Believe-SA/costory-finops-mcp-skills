@@ -2,7 +2,7 @@
   "mcpServers": {
     "costory": {
       "type": "http",
-      "url": "https://app.costory.io/api/mcp",
+      "url": "https://app-api.costory.io/mcp",
       "oauth": {
         "callbackPort": 8080
       }
