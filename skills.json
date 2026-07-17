@@ -1,0 +1,23 @@
+{
+  "version": "0.1.0",
+  "skills": {
+    "virtual_dimensions": {
+      "id": "virtual_dimensions",
+      "name": "virtual-dimensions",
+      "path": "plugins/costory/skills/virtual-dimensions/SKILL.md",
+      "description": "Create, edit, preview, and publish custom cost axes (virtual dimensions) with ordered CEL rules."
+    },
+    "dashboards": {
+      "id": "dashboards",
+      "name": "dashboards",
+      "path": "plugins/costory/skills/dashboards/SKILL.md",
+      "description": "Create or extend Costory dashboards with context-first widget inheritance."
+    },
+    "reports": {
+      "id": "reports",
+      "name": "reports",
+      "path": "plugins/costory/skills/reports/SKILL.md",
+      "description": "Create, preview, schedule, and explore DIGEST and other Costory reports with delivery safety."
+    }
+  }
+}

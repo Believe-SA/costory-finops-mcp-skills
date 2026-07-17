@@ -1,0 +1,106 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate marketplace.json
+        run: jq empty .claude-plugin/marketplace.json
+
+      - name: Validate skills.json
+        run: jq empty skills.json
+
+      - name: Validate plugin manifests
+        run: |
+          set -e
+          find . -path '*/.claude-plugin/plugin.json' -print0 | while IFS= read -r -d '' manifest; do
+            jq empty "$manifest"
+          done
+
+      - name: Plugin manifests -- skills must be a string, not an array (Codex requirement)
+        run: |
+          set -e
+          find . -path '*/.claude-plugin/plugin.json' -print0 | while IFS= read -r -d '' manifest; do
+            kind=$(jq -r '.skills | type // "null"' "$manifest")
+            case "$kind" in
+              string|null) ;;
+              *)
+                echo "::error file=$manifest::skills field is '$kind'; Codex requires a string (e.g. \"./skills/\")"
+                exit 1
+                ;;
+            esac
+          done
+
+      - name: Every skill folder has a SKILL.md
+        run: |
+          set -e
+          find plugins/*/skills -mindepth 1 -maxdepth 1 -type d | while read -r dir; do
+            [ -f "$dir/SKILL.md" ] || {
+              echo "::error file=$dir::missing SKILL.md"
+              exit 1
+            }
+          done
+
+      - name: skills.json paths must exist and versions must lockstep
+        run: |
+          set -e
+          v_market=$(jq -r '.metadata.version' .claude-plugin/marketplace.json)
+          v_plugin=$(jq -r '.version' plugins/costory/.claude-plugin/plugin.json)
+          v_index=$(jq -r '.version' skills.json)
+          [ "$v_market" = "$v_plugin" ] || {
+            echo "::error::version mismatch marketplace=$v_market plugin=$v_plugin"
+            exit 1
+          }
+          [ "$v_market" = "$v_index" ] || {
+            echo "::error::version mismatch marketplace=$v_market skills.json=$v_index"
+            exit 1
+          }
+          jq -r '.skills[].path' skills.json | while read -r path; do
+            [ -f "$path" ] || {
+              echo "::error file=skills.json::missing skill file $path"
+              exit 1
+            }
+          done
+
+      - name: SKILL.md descriptions must be <= 1024 chars (Codex drops longer ones)
+        run: |
+          set -e
+          fail=0
+          for f in plugins/*/skills/*/SKILL.md; do
+            len=$(awk -F'description: ' '/^description:/{print length($2); exit}' "$f")
+            if [ "${len:-0}" -gt 1024 ]; then
+              echo "::error file=$f::frontmatter description is $len chars; Codex's skill loader silently drops skills with descriptions > 1024"
+              fail=1
+            fi
+          done
+          exit $fail
+
+      - name: Marketplace plugin sources must be subdirectories (Codex rejects "./")
+        run: |
+          set -e
+          bad=$(jq -r '.plugins[] | select(.source == "./" or .source == ".") | .name' .claude-plugin/marketplace.json)
+          if [ -n "$bad" ]; then
+            echo "::error file=.claude-plugin/marketplace.json::plugin(s) [$bad] use source \"./\"; Codex rejects root-as-plugin entries — use ./plugins/<name>"
+            exit 1
+          fi
+
+      - name: Reject stray {{SKILLS_DIR}} placeholders
+        run: |
+          if grep -rn '{{SKILLS_DIR}}' plugins/; then
+            echo "::error::Found {{SKILLS_DIR}} in plugins/. This is the npx-skills install-time placeholder and is NOT substituted by Claude Code. Use \${CLAUDE_PLUGIN_ROOT}/skills/<skill-name>/... instead."
+            exit 1
+          fi
+
+      - name: No top-level skills/ directory
+        run: |
+          if [ -d skills ]; then
+            echo "::error::skills/ should be absent — move into plugins/costory/skills/"
+            exit 1
+          fi
