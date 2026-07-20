@@ -1,6 +1,12 @@
 {
-  "version": "0.1.0",
+  "version": "0.6.1",
   "skills": {
+    "recipes": {
+      "id": "recipes",
+      "name": "recipes",
+      "path": "plugins/costory/skills/recipes/SKILL.md",
+      "description": "Ready-made FinOps tracking designs as payload skeletons (tool sequence + frozen context/widgets + placeholders) matched to a user's outcome, then handed off to reports/dashboards/virtual-dimensions/query to build."
+    },
     "virtual_dimensions": {
       "id": "virtual_dimensions",
       "name": "virtual-dimensions",
@@ -11,13 +17,19 @@
       "id": "dashboards",
       "name": "dashboards",
       "path": "plugins/costory/skills/dashboards/SKILL.md",
-      "description": "Create or extend Costory dashboards with context-first widget inheritance."
+      "description": "Create or extend Costory dashboards with context-first widget inheritance and interesting-overview generation (suggest_groupby, suggest_usage_metrics, text widgets)."
     },
     "reports": {
       "id": "reports",
       "name": "reports",
       "path": "plugins/costory/skills/reports/SKILL.md",
-      "description": "Create, preview, schedule, and explore DIGEST and other Costory reports with delivery safety."
+      "description": "Design scheduled Slack/Teams/email reports with starter recipes (ask-first) or explain last-month cost with DIGEST + suggest_groupby; optional slower AI summary; delivery safety."
+    },
+    "query": {
+      "id": "query",
+      "name": "query",
+      "path": "plugins/costory/skills/query/SKILL.md",
+      "description": "Explore Costory cost, usage, metric, formula, budget, and external-metric data with investigation workflows."
     }
   }
 }

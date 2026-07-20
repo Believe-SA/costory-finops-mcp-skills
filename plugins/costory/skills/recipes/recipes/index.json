@@ -1,0 +1,50 @@
+[
+    {
+        "id": "1",
+        "name": "Schedule a report to track env costs",
+        "path": "plugins/costory/skills/recipes/recipes/env-costs-cto.md",
+        "category": "reports"
+    },
+    {
+        "id": "2",
+        "name": "Explain why spend changed between periods",
+        "path": "plugins/costory/skills/recipes/recipes/explain-period-change.md",
+        "category": "reports"
+    },
+    {
+        "id": "3",
+        "name": "Schedule a report to track marketplace spend by vendor",
+        "path": "plugins/costory/skills/recipes/recipes/marketplace-spend.md",
+        "category": "reports"
+    },
+    {
+        "id": "4",
+        "name": "Schedule a report to track Kubernetes cost per namespace",
+        "path": "plugins/costory/skills/recipes/recipes/namespace-cost.md",
+        "category": "reports"
+    },
+    {
+        "id": "5",
+        "name": "Track provider credits and discounts runway",
+        "path": "plugins/costory/skills/recipes/recipes/provider-credits.md",
+        "category": "reports"
+    },
+    {
+        "id": "6",
+        "name": "Reallocate shared cost by an external metric",
+        "path": "plugins/costory/skills/recipes/recipes/reallocate-by-external-metric.md",
+        "category": "virtual-dimensions"
+    },
+    {
+        "id": "7",
+        "name": "Schedule a report to track weekly eng pulse: cost by env and service",
+        "path": "plugins/costory/skills/recipes/recipes/service-cost-weekly.md",
+        "category": "reports"
+    },
+    {
+        "id": "8",
+        "name": "Measure tag coverage and untagged spend",
+        "path": "plugins/costory/skills/recipes/recipes/untagged-coverage.md",
+        "category": "reports"
+    }
+]

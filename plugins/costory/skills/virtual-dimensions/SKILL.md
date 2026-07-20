@@ -8,7 +8,7 @@ description: "Use when creating, editing, previewing, or publishing Costory virt
 A **virtual dimension** is a custom cost axis (e.g. "Environment", "Team", "Product line") built from **ordered rules**. Each rule has:
 
 - **`conditionCel`** — CEL filter selecting rows (e.g. `cos_environment in ["prod"]`)
-- **`allocation`** — where matched spend goes. Supports all types: `dimensionValue`, `existingColumn`, `splitCost`, `telemetry` (same shapes as `get_virtual_dimension` returns)
+- **`allocation`** — where matched spend goes. Supports all types: `dimensionValue`, `existingColumn`, `splitCost`, `telemetry` (same shapes as `get` returns for a virtual dimension)
 
 **Rules are evaluated top-to-bottom; first match wins.** A **leftover rule** catches everything else.
 
@@ -34,7 +34,7 @@ Write tools (`create` / `update` / `publish`) are Clerk-only — not available o
 | Draft persistence | `preview_virtual_dimension_draft` and `virtual_dimension_overlap_matrix` (when `includeDraft: true`) return `draftPersisted: true` when a pending draft exists, `draftPersisted: false` when analyzing published-only state in memory (not publishable). `create_virtual_dimension_draft` and `update_virtual_dimension_draft` persist only when validation passes — on success `draftPersisted: true` and `draftValidation: { ok: true }`; on failure nothing is saved (`draftPersisted: false`). `publish_virtual_dimension` requires a **persisted** pending draft — call `update_virtual_dimension_draft` for an existing virtualDimensionId (or `create_virtual_dimension_draft` for a brand-new VDIM) |
 | Rule order | Earlier rules claim spend; later overlapping rules are **shadowed** |
 | Leftovers | Spend not matched by any named rule — high leftover means add more rules |
-| Leftover (MCP) | Auto catch-all returned as `leftoverRule` (not in `rules`). **Do not include a catch-all in `rules` on create or update** — duplicate leftovers cause ordering confusion. Create uses `unallocated`; update has no leftover param and cannot rename the bucket — use the web app |
+| Leftover (MCP) | Auto catch-all returned as `leftoverRule` (not in `rules`). **Do not include a catch-all in `rules` on create or update** — duplicate leftovers cause ordering confusion. There is no leftover-label input on create/update — rename the leftover bucket in the web app |
 | Rule ids | **Create:** saveVirtualDimensionDraft re-stamps all rule ids — response ids are authoritative. **Update:** preserves ids from input (including when seeding a draft from published state). **Both:** ids are sticky to logical rules — reorder by moving `id` + `name` + `conditionCel` + `allocation` together; attaching an id to a different condition silently mis-assigns spend |
 | Tags | `get` returns `tags` (names) for both published and draft. Pass `tagNames` (strings) on create/update — not tag UUIDs |
 | `values` | Output-only — derived from rule allocations; do not send on create/update |
@@ -43,15 +43,15 @@ Write tools (`create` / `update` / `publish`) are Clerk-only — not available o
 | Unlabelled values | Use `cos_environment == null` in `conditionCel` (not `is_null` or string `"null"`) |
 | Declarative updates | `update_virtual_dimension_draft` takes the **full desired rules array**, not diffs |
 | `name` vs `bqName` | `name` is the display label (can change in drafts). `bqName` is the **immutable** BigQuery / CEL field name (e.g. `virtual_environment`) — set once at `create_virtual_dimension_draft` from the initial name and **never updated**, even after rename or publish. Read `bqName` from create/update/publish/get responses (or `list_virtual_dimensions` when resolving by name only) before `groupBy` / `filterCel`; **never derive it from `name`**. |
-| Post-publish query | After publish, use returned `bqName` (not `name`) in `query`. `computeStatus`: `REFRESHING` = refresh job queued — poll `get_virtual_dimension` or `list_virtual_dimensions` until `COMPLETED` before querying; `TO_REFRESH` = draft promoted but refresh job queuing failed — retry `publish_virtual_dimension` or poll `computeStatus` until `COMPLETED` |
+| Post-publish query | After publish, use returned `bqName` (not `name`) in `query`. `computeStatus`: `REFRESHING` = refresh job queued — poll `get` or `list_virtual_dimensions` until `COMPLETED` before querying; `TO_REFRESH` = draft promoted but refresh job queuing failed — retry `publish_virtual_dimension` or poll `computeStatus` until `COMPLETED` |
 
 ## Strategy approval ≠ rule approval
 
-When several mapping approaches exist (e.g. reuse `cos_environment` vs derive from `cos_sub_account_id` patterns vs split by `cos_team`), **present the options and let the user pick a strategy first**.
+When several mapping approaches exist (e.g. reuse `env` vs derive from `cos_sub_account_id` patterns vs split by `cos_team`), **present the options and let the user pick a strategy first**.
 
 **Picking a strategy is not approval to create the draft.** After the user chooses an approach:
 
-1. **Draft the concrete rules** for that strategy — each rule's `name`, `conditionCel`, and `allocation` (plus `unallocated` leftover label on create).
+1. **Draft the concrete rules** for that strategy — each rule's `name`, `conditionCel`, and `allocation` (leftover catch-all is added automatically; do not put it in `rules`).
 2. **Present the full proposed rule set** — or, when there are many rules, a representative summary (rule order, main buckets, example CEL per bucket) **plus called-out edge cases** (null/unlabelled values, ambiguous values, known shadowing risks, spend you could not classify).
 3. **Wait for explicit rule approval** — the user must confirm the rules (or request edits) before you call `create_virtual_dimension_draft`.
 
@@ -108,12 +108,12 @@ Use when the user wants a **new** axis (e.g. "build an Environment dimension", "
 ## Workflow B — Iterate on an existing virtual dimension
 
 1. `list_virtual_dimensions` with `query` — find by name and resolve `virtualDimensionId` (prefer over `search` for id resolution; use `search` only for discovery, then `list` for id)
-2. `get_virtual_dimension` — published + draft rules (CEL), dependencies
+2. `get` — published + draft rules (CEL), dependencies (`type: "virtualDimension"`)
 3. Optional diagnostics:
    - `preview_virtual_dimension_draft` `mode: "costs"` — per-rule costs + leftover %
    - `preview_virtual_dimension_draft` `mode: "breakdown"` — drill into a rule with `ruleId` + `groupBy`
    - `virtual_dimension_overlap_matrix` — shadowing / overlap between rules
-4. `update_virtual_dimension_draft` — full `rules` array (declarative replace). Copy every existing rule's `id` from `get_virtual_dimension` (draft rules if pending, else published). For `dimensionValue` rules you may edit `name`, `conditionCel`, and `allocation.dimensionValue`; for other allocation types echo `allocation` unchanged and edit only `name` / `conditionCel`. When reordering, move each `id` with its rule — ids are sticky. Rejects invalid payloads — nothing is saved until validation passes.
+4. `update_virtual_dimension_draft` — full `rules` array (declarative replace). Copy every existing rule's `id` from `get` (draft rules if pending, else published). For `dimensionValue` rules you may edit `name`, `conditionCel`, and `allocation.dimensionValue`; for other allocation types echo `allocation` unchanged and edit only `name` / `conditionCel`. When reordering, move each `id` with its rule — ids are sticky. Rejects invalid payloads — nothing is saved until validation passes.
 5. `preview_virtual_dimension_draft` `mode: "costs"`
 6. `publish_virtual_dimension` — only when the user explicitly confirms
 
@@ -161,7 +161,7 @@ After adding a broad rule above a narrower one, a later rule can show **0** in p
 | Tool | Mutates? | Use |
 |------|----------|-----|
 | `list_virtual_dimensions` | no | Find VDIM by name/tag |
-| `get_virtual_dimension` | no | Published + draft rules (CEL), dependencies |
+| `get` | no | Published + draft rules (CEL), dependencies (`type: "virtualDimension"`) |
 | `create_virtual_dimension_draft` | draft | New VDIM |
 | `update_virtual_dimension_draft` | draft | Full rules array replace (or metadata-only when `rules` omitted) |
 | `preview_virtual_dimension_draft` | no | BQ: costs or breakdown |
@@ -170,7 +170,7 @@ After adding a broad rule above a narrower one, a later rule can show **0** in p
 
 ## Example: "Create an Environment virtual dimension"
 
-1. `search` `{ query: "", type: ["dimensions"] }` → find `cos_environment` and its values; `{ query: "prod", type: ["dimensions"] }` → find values like `sub_account_id` containing "prod"
+1. `search` `{ query: "", type: ["dimensions"] }` → find `env` and its values; `{ query: "prod", type: ["dimensions"] }` → find values like `sub_account_id` containing "prod"
 2. **Present mapping options** → user picks strategy
 3. **Present proposed rules → explicit rule approval**
 4. `create_virtual_dimension_draft` with approved prod/staging/dev rules

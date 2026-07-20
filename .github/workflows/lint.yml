@@ -69,6 +69,38 @@ jobs:
             }
           done
 
+      - name: Validate recipes index.json
+        run: |
+          set -e
+          index=plugins/costory/skills/recipes/recipes/index.json
+          jq empty "$index"
+          bad=$(jq -r '.[] | select((.id | type != "string" or length == 0)
+                                 or (.name | type != "string" or length == 0)
+                                 or (.path | type != "string" or length == 0)
+                                 or (.category | type != "string" or length == 0))
+                       | .id // "unknown"' "$index")
+          if [ -n "$bad" ]; then
+            echo "::error file=$index::entries with missing/empty id, name, path, or category: $bad"
+            exit 1
+          fi
+          dupes=$(jq -r '.[].id' "$index" | sort | uniq -d)
+          if [ -n "$dupes" ]; then
+            echo "::error file=$index::duplicate ids: $dupes"
+            exit 1
+          fi
+          jq -r '.[].path' "$index" | while read -r path; do
+            [ -f "$path" ] || {
+              echo "::error file=$index::missing recipe file $path"
+              exit 1
+            }
+          done
+          for f in plugins/costory/skills/recipes/recipes/*.md; do
+            jq -e --arg f "$f" 'any(.[]; .path == $f)' "$index" > /dev/null || {
+              echo "::error file=$index::recipe file $f is not listed in index.json"
+              exit 1
+            }
+          done
+
       - name: SKILL.md descriptions must be <= 1024 chars (Codex drops longer ones)
         run: |
           set -e
