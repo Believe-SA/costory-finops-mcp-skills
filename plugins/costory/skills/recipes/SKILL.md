@@ -10,7 +10,7 @@ A **recipe** is a ready-made design for a common FinOps tracking goal — scope,
 ## How to use this skill
 
 1. Match the user's goal using **Pick a recipe** below (triggers + "not this if").
-2. **Read only that one file** under `recipes/`.
+2. **Read only that one file** under `plugins/costory/skills/recipes/`.
 3. Run the card's **Tool sequence** through confirm gates — do not fire mutation/delivery tools until confirmed.
 4. Fill `[PLACEHOLDERS]` from discovery + user answers; keep frozen fields as written.
 5. Restate the **Brief**, then hand off the filled skeleton to the named mechanics skill.
@@ -38,14 +38,14 @@ Read the matching file. Do not improvise a blend of two cards until the user ask
 
 | If the user means… | Signals (phrases / audience) | You get | Not this if… | Read |
 |--------------------|------------------------------|---------|--------------|------|
-| **Why did spend move?** (one-shot) | "why did the bill jump", "what changed last month", "explain the spike", finance-review prep — **ad-hoc**, not recurring | DIGEST change tree (± optional AI); usually chat preview | they want a **standing** weekly/monthly channel report → pick a Schedule recipe below | `recipes/explain-period-change.md` |
-| **Marketplace / vendor spend** | "marketplace", "private offer", "third-party on the cloud bill", "spend by seller/issuer" — Finance / procurement | Monthly marketplace-only trend + top vendors by `cos_invoice_issuer` | native cloud usage (EC2 etc.) — wrong recipe | `recipes/marketplace-spend.md` |
-| **K8s cost per namespace** | "namespace", "EKS/GKE", "cluster showback", platform/DevOps weekly | Weekly reallocated-namespace trend + top/flop | env or account rollup without namespaces → `service-cost-weekly` or `env-costs-cto` | `recipes/namespace-cost.md` |
-| **Credits / discounts runway** | "credits burning", "savings plan / CUDs", "promotional credits", "discount lines", charge category | Monthly charge-category trend + movers | usage-by-service operating view → `service-cost-weekly` | `recipes/provider-credits.md` |
-| **Weekly eng FinOps pulse** | "weekly by env and service", "weekly pulse", "what moved per service" — eng/FinOps, **actionable drivers** | Weekly graph + DIGEST env/account → service, **AI on** | exec-only "prod vs staging" one number → `env-costs-cto`; one-shot "why did it jump" → explain | `recipes/service-cost-weekly.md` |
-| **Tagging / allocation coverage** | "untagged", "tag coverage", "missing team/env tag", "can't allocate the bill" | `tagged / all` ratio trend + worst services (formula via `query` first) | absolute spend by tag value (that's a normal split, not coverage) | `recipes/untagged-coverage.md` |
-| **Exec cost per environment** | "CTO wants env costs", "prod vs non-prod", leadership monthly readout — **simple**, not drill-down | Monthly top envs (no flop) ± yearly graph; **build `env` VDIM first** | weekly service drivers / AI narrative → `service-cost-weekly` | `recipes/env-costs-cto.md` |
-| **Reallocate by external metric** | "split shared cost by usage", "unit economics then allocate", "showback by requests/revenue/CPU", proportional fair share | Validate cost ÷ metric in `query`, then **telemetry VDIM** publish | simple cost ÷ metric KPI only (no reallocation) → `query` Workflow E; fixed 60/40 weights → `virtual-dimensions` splitCost | `recipes/reallocate-by-external-metric.md` |
+| **Why did spend move?** (one-shot) | "why did the bill jump", "what changed last month", "explain the spike", finance-review prep — **ad-hoc**, not recurring | DIGEST change tree (± optional AI); usually chat preview | they want a **standing** weekly/monthly channel report → pick a Schedule recipe below | `plugins/costory/skills/recipes/explain-period-change.md` |
+| **Marketplace / vendor spend** | "marketplace", "private offer", "third-party on the cloud bill", "spend by seller/issuer" — Finance / procurement | Monthly marketplace-only trend + top vendors by `cos_invoice_issuer` | native cloud usage (EC2 etc.) — wrong recipe | `plugins/costory/skills/recipes/marketplace-spend.md` |
+| **K8s cost per namespace** | "namespace", "EKS/GKE", "cluster showback", platform/DevOps weekly | Weekly reallocated-namespace trend + top/flop | env or account rollup without namespaces → `service-cost-weekly` or `env-costs-cto` | `plugins/costory/skills/recipes/namespace-cost.md` |
+| **Credits / discounts runway** | "credits burning", "savings plan / CUDs", "promotional credits", "discount lines", charge category | Monthly charge-category trend + movers | usage-by-service operating view → `service-cost-weekly` | `plugins/costory/skills/recipes/provider-credits.md` |
+| **Weekly eng FinOps pulse** | "weekly by env and service", "weekly pulse", "what moved per service" — eng/FinOps, **actionable drivers** | Weekly graph + DIGEST env/account → service, **AI on** | exec-only "prod vs staging" one number → `env-costs-cto`; one-shot "why did it jump" → explain | `plugins/costory/skills/recipes/service-cost-weekly.md` |
+| **Tagging / allocation coverage** | "untagged", "tag coverage", "missing team/env tag", "can't allocate the bill" | `tagged / all` ratio trend + worst services (formula via `query` first) | absolute spend by tag value (that's a normal split, not coverage) | `plugins/costory/skills/recipes/untagged-coverage.md` |
+| **Exec cost per environment** | "CTO wants env costs", "prod vs non-prod", leadership monthly readout — **simple**, not drill-down | Monthly top envs (no flop) ± yearly graph; **build `env` VDIM first** | weekly service drivers / AI narrative → `service-cost-weekly` | `plugins/costory/skills/recipes/env-costs-cto.md` |
+| **Reallocate by external metric** | "split shared cost by usage", "unit economics then allocate", "showback by requests/revenue/CPU", proportional fair share | Validate cost ÷ metric in `query`, then **telemetry VDIM** publish | simple cost ÷ metric KPI only (no reallocation) → `query` Workflow E; fixed 60/40 weights → `virtual-dimensions` splitCost | `plugins/costory/skills/recipes/reallocate-by-external-metric.md` |
 
 ### Quick disambiguation
 
@@ -63,6 +63,6 @@ Cards use real `datePreset` tokens (`LAST_MONTH`, `LAST_WEEK`, `LAST_INVOICE_MON
 
 ## Adding a recipe
 
-One file in `recipes/` + one row in **Pick a recipe** (triggers, outcome, "not this if"). Card format:
+One file in `plugins/costory/skills/recipes/` + one row in **Pick a recipe** (triggers, outcome, "not this if"). Card format:
 
 **When · Audience · Outcome · Tool sequence · Payload skeleton · Confirm before build · Gotchas · Brief · Hand off**
