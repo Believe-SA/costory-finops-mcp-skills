@@ -1,7 +1,7 @@
 [
     {
         "id": "1",
-        "name": "Weekly Env costs",
+        "name": "Weekly Environment Costs",
         "prompt": "Schedule a report to track cost by environment for leadership.",
         "path": "plugins/costory/skills/recipes/env-costs-cto.md",
         "category": "reports"
@@ -11,7 +11,7 @@
         "name": "Explain change",
         "prompt": "Explain the changes in spend with last month.",
         "path": "plugins/costory/skills/recipes/explain-period-change.md",
-        "category": "reports"
+        "category": "explore"
     },
     {
         "id": "3",
@@ -22,7 +22,7 @@
     },
     {
         "id": "4",
-        "name": "Namespace cost",
+        "name": "K8S report",
         "prompt": "Schedule a report to track Kubernetes cost per namespace.",
         "path": "plugins/costory/skills/recipes/namespace-cost.md",
         "category": "reports"
@@ -50,49 +50,49 @@
     },
     {
         "id": "8",
-        "name": "Tag coverage",
+        "name": "Monitor Tag Coverage",
         "prompt": "Measure tag coverage and untagged spend.",
         "path": "plugins/costory/skills/recipes/untagged-coverage.md",
         "category": "reports"
     },
     {
         "id": "9",
-        "name": "Prod vs R&D costs",
+        "name": "Explain to me my Prod vs R&D costs",
         "prompt": "Explain to me my Prod vs R&D costs ?",
         "path": "plugins/costory/skills/recipes/prod-vs-rnd-explore.md",
         "category": "explore"
     },
     {
         "id": "10",
-        "name": "Budget vs actual daily",
+        "name": "Follow my budget vs actual per day",
         "prompt": "Generate me a dashboard to follow budget vs actual per day ?",
         "path": "plugins/costory/skills/recipes/budget-vs-actual-dashboard.md",
         "category": "budget"
     },
     {
         "id": "11",
-        "name": "Credits YTD",
+        "name": "Credits Received",
         "prompt": "How much credits did we receive this year ?",
         "path": "plugins/costory/skills/recipes/credits-ytd-explore.md",
         "category": "explore"
     },
     {
         "id": "12",
-        "name": "EC2 +10% spike alert",
+        "name": "Alert me if EC2 +10% spike",
         "prompt": "Warn me if cost of AmazonEC2 increases by more than 10% compared to the trailing 7 days.",
         "path": "plugins/costory/skills/recipes/ec2-cost-spike-alert.md",
         "category": "alerts"
     },
     {
         "id": "13",
-        "name": "Prod vs R&D virtual dimension",
+        "name": "Build my first virtual dimension: Env",
         "prompt": "Can you help me build a virtual dimension to split my production from R&D costs ?",
         "path": "plugins/costory/skills/recipes/prod-vs-rnd-vdim.md",
         "category": "virtual-dimensions"
     },
     {
         "id": "14",
-        "name": "Compute drill-down dimension",
+        "name": "What dimension can i use to drill down compute costs ?",
         "prompt": "What dimension can i use to drill down compute costs ?",
         "path": "plugins/costory/skills/recipes/compute-drilldown-dimension.md",
         "category": "dimension"
