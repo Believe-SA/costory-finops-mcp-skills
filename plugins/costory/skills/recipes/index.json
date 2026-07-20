@@ -88,7 +88,7 @@
         "name": "Build my first virtual dimension: Env",
         "prompt": "Can you help me build a virtual dimension to split my production from R&D costs ?",
         "path": "plugins/costory/skills/recipes/prod-vs-rnd-vdim.md",
-        "category": "virtual-dimensions"
+        "category": "dimension"
     },
     {
         "id": "14",
