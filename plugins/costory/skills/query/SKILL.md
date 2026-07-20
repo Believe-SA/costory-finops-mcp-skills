@@ -526,5 +526,5 @@ After useful results, consider:
 
 - `dashboards` — persist a validated query as widgets (`skillId: "dashboards"`)
 - `reports` — scheduled DIGEST / delivered report (`skillId: "reports"`)
-- `virtual-dimensions` — custom cost axis when no dimension fits (`skillId: "virtual_dimensions"`)
+- `virtual-dimensions` — custom cost axis when no dimension fits (`skillId: "virtual-dimensions"`)
 - `recipes` — reallocate shared cost by an external / usage metric → `reallocate-by-external-metric`

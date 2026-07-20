@@ -1,5 +1,5 @@
 {
-  "version": "0.6.1",
+  "version": "0.6.2",
   "skills": {
     "recipes": {
       "id": "recipes",
@@ -7,8 +7,8 @@
       "path": "plugins/costory/skills/recipes/SKILL.md",
       "description": "Ready-made FinOps tracking designs as payload skeletons (tool sequence + frozen context/widgets + placeholders) matched to a user's outcome, then handed off to reports/dashboards/virtual-dimensions/query to build."
     },
-    "virtual_dimensions": {
-      "id": "virtual_dimensions",
+    "virtual-dimensions": {
+      "id": "virtual-dimensions",
       "name": "virtual-dimensions",
       "path": "plugins/costory/skills/virtual-dimensions/SKILL.md",
       "description": "Create, edit, preview, and publish custom cost axes (virtual dimensions) with ordered CEL rules."

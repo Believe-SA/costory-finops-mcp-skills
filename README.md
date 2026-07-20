@@ -17,11 +17,13 @@ plugins/costory/
 
 ## Skills
 
-| MCP `skillId` | Plugin skill | Use when |
-|---------------|--------------|----------|
-| `virtual_dimensions` | `virtual-dimensions` | Create / edit / preview / publish custom cost axes |
-| `dashboards` | `dashboards` | Create or extend dashboards with context-first widgets |
-| `reports` | `reports` | DIGEST and other reports: preview, schedule, delivery safety |
+| MCP `skillId` | Use when |
+|---------------|----------|
+| `virtual-dimensions` | Create / edit / preview / publish custom cost axes |
+| `dashboards` | Create or extend dashboards with context-first widgets |
+| `reports` | DIGEST and other reports: preview, schedule, delivery safety |
+| `query` | Cost / usage / metric investigation workflows |
+| `recipes` | Outcome-based FinOps tracking designs → hand off to mechanics |
 
 ## Install (Claude Code / Codex)
 

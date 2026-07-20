@@ -1,11 +1,11 @@
 ---
 name: reports
-description: "Use when creating, previewing, updating, scheduling, or exploring Costory reports. Route by intent: scheduled Slack/Teams/email sharing (Schedule workflow — accompany the user, offer starter report designs, ask before build) vs explain last-month cost with DIGEST + suggest_groupby (Explain workflow — NOW). Workflows are named, never lettered. DIGEST AI summary is optional and slower. Covers GRAPH_SNAPSHOT, TOP_FLOP, DASHBOARD_PDF, context-first inheritance, destinations discovered only after the channel type is known, and delivery safety. Call get_skill with skillId \"reports\" before create_report or substantial report work."
+description: "Use when creating, previewing, updating, scheduling, or exploring Costory reports. Route by intent: scheduled Slack/Teams/email sharing (Schedule workflow — accompany the user, offer starter report designs, ask before build) vs explain last-month cost with DIGEST + suggest_groupby (Explain workflow — NOW). Workflows are named, never lettered. DIGEST AI is opt-in via display: \"summary\" (executive narrative) and/or enableAiInvestigation (per-node deep analysis) — both slower. Covers GRAPH_SNAPSHOT, TOP_FLOP, DASHBOARD_PDF, context-first inheritance, destinations discovered only after the channel type is known, and delivery safety. Call get_skill with skillId \"reports\" before create_report or substantial report work."
 ---
 
 # Reports
 
-**Skill body version 0.4.1.** Workflows here are **named** — Schedule, Explain, Update, Run, Explore. Older bodies lettered them A–E, and other Costory surfaces used a different letter order. If you are holding a lettered routing table for reports, it is stale: route by the names in this body and ignore the letters.
+**Skill body version 0.4.3.** Workflows here are **named** — Schedule, Explain, Update, Run, Explore. Older bodies lettered them A–E, and other Costory surfaces used a different letter order. If you are holding a lettered routing table for reports, it is stale: route by the names in this body and ignore the letters.
 
 A **report** has a shared **`context`** (global theme) and **widgets** that inherit it by default. It delivers those widgets (chart snapshot, PDF, top/flop, text, or **DIGEST** cost-change tree) to one or more destinations (Slack, Teams, email). Same mental model as dashboards: shared `context` + per-widget overrides. `create_report`, `update_report`, and `preview_report_widget` all take the same report-level `context`.
 
@@ -18,7 +18,7 @@ Everything below this section is detail. These six are the contract:
 1. **Ask before build.** Do not pick widgets, call `preview_report_widget`, or call `create_report` until the design is confirmed. Never silently default to DIGEST, a graph, or an AI summary.
 2. **Context-first.** Once answers are in, define the full report `context` before listing widgets. Widgets carry **only overrides** — never duplicate what already lives in `context`.
 3. **Destinations last.** Do not call `list_available_destinations` until the user has named the channel **type** (Slack / Teams / email). Then list only that type and propose matches by name — never paste a whole channel list into the conversation.
-4. **AI summary is opt-in.** DIGEST-only, noticeably slower, off unless the user asks for it.
+4. **AI features are opt-in.** DIGEST-only. Set `display: "summary"` for the executive narrative and/or `enableAiInvestigation: true` for per-node deep analysis — both default off (tree-only) and are slower.
 5. **Confirm delivery.** Both `NOW` and `SCHEDULED` need explicit confirmation before `create_report`. `UNSCHEDULED` does not.
 6. **`datePreset`, never frozen dates,** on `SCHEDULED` reports.
 
@@ -88,13 +88,13 @@ Fill only what is still missing — keep it conversational:
 
 1. **Scope** — whole org, `scopeId` from `list_teams`, and/or `conditionsCel`
 2. **Split / hierarchy** — if DIGEST is in the mix: confirm root + deeper levels, or run `suggest_groupby` and propose a tree in plain language
-3. **Optional AI summary** (DIGEST only) — ask explicitly, mention it takes longer, default off unless they want the narrative
+3. **Optional AI** (DIGEST only) — ask explicitly: executive narrative (`display: "summary"`) and/or per-node investigation (`enableAiInvestigation: true`); both slower; default tree-only (`display: "tree"`, investigation off)
 4. **Cadence details** — WEEKLY needs `weekday` (0 = Sunday … 6 = Saturday); set `firstRunAt` (ISO-8601 UTC); use presets that roll forward (`LAST_WEEK`, `LAST_MONTH`, …). Refuse frozen `from`/`to` on SCHEDULED reports
 5. **Currency / metric** — usually `cost` + org currency from `get_context`
 
 The channel **type** is already known from step 1; the concrete destination is resolved at build time, not here.
 
-Then restate a **one-paragraph design brief** (audience, cadence, widgets, scope, AI summary yes/no) and get confirmation before building.
+Then restate a **one-paragraph design brief** (audience, cadence, widgets, scope, AI narrative / investigation yes/no) and get confirmation before building.
 
 ### 4 — Build
 
@@ -102,7 +102,7 @@ Then restate a **one-paragraph design brief** (audience, cadence, widgets, scope
 2. Steps 1–3 above → design brief confirmed
 3. If the DIGEST hierarchy was open-ended → `suggest_groupby` with the planned period + scope filter → propose root + `additionalGroupBy` → confirm
 4. **Draft the report `context` first** — shared `datePreset` / metric / currency / `groupBy` / scope
-5. If DIGEST is in the mix → `preview_report_widget` (defaults **100 / 5% / 20**; AI summary only if opted in) → tune → re-preview
+5. If DIGEST is in the mix → `preview_report_widget` (defaults **100 / 5% / 20**; set `display: "summary"` / `enableAiInvestigation` only if opted in) → tune → re-preview
 6. **Now** resolve delivery: `list_available_destinations` for the chosen channel type → propose matches by name → confirm the specific destination. Missing Slack/Teams integration → https://app.costory.io/integration
 7. Confirm `schedule.mode: "SCHEDULED"` (period, weekday, `firstRunAt`) → `create_report` with the **same `context` + widgets** you previewed
 
@@ -112,14 +112,14 @@ Then restate a **one-paragraph design brief** (audience, cadence, widgets, scope
 
 **Triggers:** explain last month's cost; what changed last month and why; one-shot narrative for stakeholders.
 
-**Goal:** a `NOW` (or preview-first, then NOW) report whose primary widget is **DIGEST**, with hierarchy from `suggest_groupby`. The core deliverable is the **change tree**; the AI summary is optional and slower.
+**Goal:** a `NOW` (or preview-first, then NOW) report whose primary widget is **DIGEST**, with hierarchy from `suggest_groupby`. The core deliverable is the **change tree**; AI narrative / investigation are optional and slower.
 
 ### 1 — Ask first (required)
 
 1. **Scope** — whole org, team (`scopeId`), and/or CEL filter?
 2. **Audience** — preview in chat only, or send NOW to Slack / Teams / email?
 3. **Hierarchy preference** — if they already know the tree (e.g. team → service), confirm it; otherwise you will propose from `suggest_groupby`
-4. **Optional AI summary** — ask if they want the narrative add-on; warn it takes longer; default off unless they need an exec-style write-up
+4. **Optional AI** — ask if they want the executive narrative (`display: "summary"`) and/or per-node investigation (`enableAiInvestigation: true`); warn both take longer; default tree-only
 5. **Optional extras** — add a GRAPH_SNAPSHOT (e.g. `TRAILING_14_WEEKS`) only if they also want a trend image
 
 Do not skip to a graph-only report for this trigger — the core ask is explanation → DIGEST tree.
@@ -135,8 +135,8 @@ Do not skip to a graph-only report for this trigger — the core ask is explanat
 ### 3 — Preview DIGEST
 
 1. Draft `context`: `datePreset: "LAST_MONTH"`, confirmed `groupBy`, `metricId`, `currency`, optional scope
-2. `preview_report_widget` with a minimal DIGEST widget (`additionalGroupBy`, thresholds **100 / 5% / 20**, `aggBy: "Month"`; AI summary only if opted in at step 1)
-3. Present totals, top increases/decreases, and the tree outline (`rootNodes`); include `summaryMarkdown` only when the AI summary was enabled
+2. `preview_report_widget` with a minimal DIGEST widget (`additionalGroupBy`, thresholds **100 / 5% / 20**, `aggBy: "Month"`; `display: "summary"` / `enableAiInvestigation: true` only if opted in at step 1)
+3. Present totals, top increases/decreases, and the tree outline (`rootNodes`); include `summaryMarkdown` only when `display: "summary"`
 4. Tune from `recommendations` / user feedback → re-preview
 
 ### 4 — Deliver
@@ -199,32 +199,61 @@ Consequences worth knowing:
 - **Per-widget periods are normal** — e.g. GRAPH = `TRAILING_14_WEEKS`, TOP_FLOP = `LAST_WEEK`. Keep shared fields on `context`; override only `datePreset` (and presentation) on the widget.
 - **Never combine** `datePreset` with explicit dates on the same layer.
 - **`conditionsCel` is report-wide** — do not repeat it inside every widget `filterCel`.
-- **TEXT and DASHBOARD_PDF do not inherit query fields.** PDF period lives on the referenced dashboard; TEXT is static markdown.
+- **TEXT and DASHBOARD_PDF do not inherit query fields.** PDF period lives on the referenced dashboard; TEXT is static markdown in `contentMarkdown` (not dashboard `textContent`).
 - Use `startDate`/`endDate` (or widget `from`/`to`) only for truly custom one-off ranges — never on `SCHEDULED` reports.
 
 ## Widget types
 
 | Type | What it delivers | Best for |
 |------|------------------|----------|
-| `DIGEST` | Cost-change **tree** vs previous period; optional AI executive summary | Explain what moved (monthly / weekly) |
+| `DIGEST` | Cost-change **tree** vs previous period; optional `display: "summary"` narrative and/or `enableAiInvestigation` | Explain what moved (monthly / weekly) |
 | `GRAPH_SNAPSHOT` | Chart image from a cost/usage/metric query | Trends, migration tracking, composition over time |
 | `TOP_FLOP` | Ranked increases / decreases for a period | "What blew up / what dropped last week?" |
 | `DASHBOARD_PDF` | PDF of an existing dashboard (`dashboardId`) | Weekly/monthly pack of a known dashboard |
-| `TEXT` | Static markdown | Context, how-to-read notes, links (**not** live AI) |
+| `TEXT` | Static markdown via `contentMarkdown` | Context, how-to-read notes, links (**not** live AI) |
 
 A report can combine several widgets. Prefer variety of **questions**, not duplicate charts.
 
-## Optional AI summary (DIGEST only)
+## DIGEST AI options (`display` + `enableAiInvestigation`)
 
-DIGEST always delivers the change tree. The AI executive summary (`summaryMarkdown`) is an add-on the user must opt into.
+Two independent DIGEST fields control AI (both opt-in; both slower):
 
-- **Offer it when** they want a written narrative of what changed and why (exec / stakeholder read).
-- **Say the trade-off out loud:** richer narrative, but noticeably slower to preview and to deliver. Ask plainly: *"Do you want the optional AI summary? Useful for exec readouts, but slower to generate."*
-- **Default to tree-only** (faster) unless they opt in.
-- **Check the live DIGEST widget / preview schema for an enable flag.** If the schema exposes no summary-enable field, the summary **cannot be toggled via MCP** — say so, deliver tree-only, and point the user to the Costory web app for the AI narrative. Never invent a field, a separate AI widget, or a fake summary via TEXT.
+| Field | Values / default | What it does |
+|-------|------------------|--------------|
+| `display` | `"tree"` (default) \| `"table"` \| `"summary"` | Presentation. `"summary"` = LLM executive narrative (`summaryMarkdown`). `"tree"` / `"table"` = structured view only (faster). |
+| `enableAiInvestigation` | `false` (default) \| `true` | Per-node deep analysis on deepest-leaf movers (async; delivery waits). **Independent** of `display`. |
+
+Analysis presets (map intent → fields; do not invent other knobs):
+
+| Intent | Fields |
+|--------|--------|
+| Direct tree (default) | `display: "tree"`, `enableAiInvestigation: false` (or omit both) |
+| Executive summary | `display: "summary"`, `enableAiInvestigation: false` |
+| Deep investigation | `display: "summary"`, `enableAiInvestigation: true`, `topLargestAbsoluteChange: 20` |
+
+- **Offer narrative** when they want a written overview of what changed and why (exec / stakeholder read). Set `display: "summary"`.
+- **Offer investigation** only when they want per-node AI explanations under the tree — warn it is noticeably slower. Set `enableAiInvestigation: true`. Prefer `display: "summary"` with it so the narrative can ground on those findings; do not ask a second tree-vs-summary question once deep investigation is chosen.
+- **Say the trade-off out loud** before enabling either. Ask plainly: *"Tree-only (faster), an AI executive summary, or deep per-node investigation (slowest)?"*
+- **Default to tree-only** unless they opt in. Never invent a separate AI widget or fake a summary via TEXT.
 - Only DIGEST produces `summaryMarkdown` — never claim one from GRAPH_SNAPSHOT, TOP_FLOP, TEXT, or DASHBOARD_PDF.
 
-Pairings: tree is enough → DIGEST alone. Narrative + tree → DIGEST with summary. Trend or movers only → GRAPH_SNAPSHOT / TOP_FLOP. Static intro → TEXT. Narrative + trend → DIGEST plus GRAPH_SNAPSHOT / TOP_FLOP.
+Pairings: tree is enough → DIGEST alone (defaults). Narrative + tree → DIGEST with `display: "summary"`. Deep dig → DIGEST with `display: "summary"` + `enableAiInvestigation: true`. Trend or movers only → GRAPH_SNAPSHOT / TOP_FLOP. Static intro → TEXT.
+
+## TEXT widgets
+
+Free-form markdown block. Shape is **`{ type: "TEXT", contentMarkdown }`** — optional `title` / `description`.
+
+- Field name is **`contentMarkdown`** (1–10,000 characters after trim). Do **not** use `textContent` — that is the **dashboards** text-widget field (`type: "text"`).
+- No queries, period, or inheritance from report `context`.
+- Not a substitute for the DIGEST AI summary (`summaryMarkdown`).
+
+```json
+{
+  "type": "TEXT",
+  "title": "How to read this report",
+  "contentMarkdown": "## Weekly pulse\n\nFocus on the TOP_FLOP movers below, then open the graph for trend context."
+}
+```
 
 ## DIGEST hierarchy
 
@@ -262,14 +291,16 @@ Same query shape as `query`, minus anything that matches `context`:
 | `minAbsoluteDiff` | **100** |
 | `minRelativeDiff` | **5** (percent) |
 | `topLargestAbsoluteChange` | **20** (allowed: 5, 10, 15, or 20) |
+| `display` | **`"tree"`** (set `"summary"` only when opted in) |
+| `enableAiInvestigation` | **`false`** (set `true` only when opted in) |
 
-Always show `resolvedPeriod` (when present), `comparisonPeriodSummary`, `totals`, `counts`, `topIncreases` / `topDecreases`, and `rootNodes`. Show `summaryMarkdown` only when the user opted into the AI summary (and warn that that preview may take longer).
+Always show `resolvedPeriod` (when present), `comparisonPeriodSummary`, `totals`, `counts`, `topIncreases` / `topDecreases`, and `rootNodes`. Show `summaryMarkdown` only when `display: "summary"` (and warn that that preview may take longer).
 
 Tune from `recommendations`: thresholds, `topLargestAbsoluteChange` (only 5, 10, 15, or 20), grouping. Repeat `preview_report_widget` until satisfied.
 
 ## Examples
 
-**Monthly DIGEST (after the user confirmed the recipe):**
+**Monthly DIGEST (after the user confirmed the recipe) — tree-only defaults:**
 
 ```json
 {
@@ -288,6 +319,22 @@ Tune from `recommendations`: thresholds, `topLargestAbsoluteChange` (only 5, 10,
     "minRelativeDiff": 5,
     "topLargestAbsoluteChange": 20
   }]
+}
+```
+
+**Same DIGEST with executive AI summary** (add when opted in):
+
+```json
+{
+  "type": "DIGEST",
+  "queries": [{ "type": "cost", "name": "a", "alias": "Cost by environment" }],
+  "aggBy": "Month",
+  "additionalGroupBy": ["cos_sub_account_id", "cos_service_name"],
+  "minAbsoluteDiff": 100,
+  "minRelativeDiff": 5,
+  "topLargestAbsoluteChange": 20,
+  "display": "summary",
+  "enableAiInvestigation": false
 }
 ```
 
@@ -339,6 +386,16 @@ Tune from `recommendations`: thresholds, `topLargestAbsoluteChange` (only 5, 10,
 }
 ```
 
+**TEXT intro (report field is `contentMarkdown`, not dashboard `textContent`):**
+
+```json
+{
+  "type": "TEXT",
+  "title": "How to read this report",
+  "contentMarkdown": "## Weekly pulse\n\nFocus on the TOP_FLOP movers below."
+}
+```
+
 **Full `create_report` (scheduled):**
 
 ```json
@@ -369,6 +426,7 @@ The conversation rules live in **Must-follow rules** above. These are the shape 
 - Do not put the global scope in each widget's `filterCel` instead of `context.conditionsCel`
 - Do not confuse ownership (`teamId` / `visibility`) with query scope (`scopeId` / `conditionsCel` / `filterCel`)
 - Do not use a different shape for preview vs create — same `context` + widget object
+- Do not send dashboard `textContent` on a report TEXT widget — the field is `contentMarkdown` with `type: "TEXT"`
 - Do not skip preview before create when DIGEST is in the mix
 - Do not skip confirming the DIGEST tree path after `suggest_groupby`
 - Do not substitute destinations silently

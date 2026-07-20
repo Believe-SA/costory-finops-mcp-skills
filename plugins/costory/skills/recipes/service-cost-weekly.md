@@ -52,7 +52,9 @@
       "additionalGroupBy": ["cos_service_name"],
       "minAbsoluteDiff": 100,
       "minRelativeDiff": 5,
-      "topLargestAbsoluteChange": 20
+      "topLargestAbsoluteChange": 20,
+      "display": "summary",
+      "enableAiInvestigation": false
     }
   ],
   "destinations": [{
@@ -62,20 +64,20 @@
 }
 ```
 
-Frozen: shared `LAST_WEEK` (GRAPH overrides to `TRAILING_14_WEEKS` for the trend — without it the graph inherits `LAST_WEEK` and renders a single point); deeper split always `cos_service_name`; DIGEST thresholds **100 / 5% / 20**; **AI summary ON** (exception — call out when confirming; if the live DIGEST widget schema exposes no summary-enable field, say so and deliver tree-only, pointing the user to the web app for the AI narrative). `[ROOT_GROUPBY]` = published `env` `bqName` if available, else `cos_sub_account_id`. Default delivery type Slack — still resolve the concrete channel after type is known.
+Frozen: shared `LAST_WEEK` (GRAPH overrides to `TRAILING_14_WEEKS` for the trend — without it the graph inherits `LAST_WEEK` and renders a single point); deeper split always `cos_service_name`; DIGEST thresholds **100 / 5% / 20**; **AI summary ON** via `display: "summary"` (exception — call out when confirming; slower). `[ROOT_GROUPBY]` = published `env` `bqName` if available, else `cos_sub_account_id`. Default delivery type Slack — still resolve the concrete channel after type is known.
 
 ## Confirm before build
 
 1. Root axis: `env` (build VDIM?) vs `cos_sub_account_id` (ship now)
 2. Scope whole-org vs team/BU
 3. Weekday + Slack channel
-4. AI summary stays on (slower) — user OK?
+4. `display: "summary"` stays on (slower) — user OK?
 
 ## Gotchas
 
 - One-level env alone isn't actionable — keep the service deeper split.
-- Don't silently flip AI off; this recipe opts in on purpose.
+- Don't silently flip AI off; this recipe opts in on purpose (`display: "summary"`).
 
-**Brief:** *"Weekly pulse: graph by [env|sub-account] + DIGEST [root] → service with AI summary, every [weekday] to [Slack channel]."*
+**Brief:** *"Weekly pulse: graph by [env|sub-account] + DIGEST [root] → service with display summary, every [weekday] to [Slack channel]."*
 
 **→ Hand off to `dashboards` (interactive graph, optional) and/or `reports` (Schedule).**

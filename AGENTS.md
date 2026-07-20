@@ -17,18 +17,21 @@ Notes:
 - **No top-level `skills/` directory.** Every skill lives under `plugins/costory/skills/`.
 - **No `.codex-plugin/` directory.** Codex consumes the same `.claude-plugin/marketplace.json`.
 - **No `skills[]` array in marketplace.json.** Skills are auto-discovered from the plugin's `skills/` directory.
-- **`skills.json`** maps Costory MCP `skillId` values (`virtual_dimensions`, `dashboards`, `reports`, `query`) to on-disk paths so the backend can load markdown without hardcoding content.
+- **`skills.json`** maps Costory MCP `skillId` values (`virtual-dimensions`, `dashboards`, `reports`, `query`, `recipes`) to on-disk paths so the backend can load markdown without hardcoding content.
 
 ## Skill ID mapping (Costory MCP)
 
-| MCP `skillId` | Plugin skill folder / frontmatter `name` |
-|---------------|------------------------------------------|
-| `virtual_dimensions` | `virtual-dimensions` |
-| `dashboards` | `dashboards` |
-| `reports` | `reports` |
-| `query` | `query` |
+`skillId`, folder name, and frontmatter `name` are the **same kebab-case token**:
 
-When Costory `get_skill` is wired to this repo, resolve via `skills.json` (preferred) or the table above. Return the **body** of `SKILL.md` (optionally strip YAML frontmatter).
+| MCP `skillId` |
+|---------------|
+| `virtual-dimensions` |
+| `dashboards` |
+| `reports` |
+| `query` |
+| `recipes` |
+
+When Costory `get_skill` is wired to this repo, resolve via `skills.json`. Return the **body** of `SKILL.md` (optionally strip YAML frontmatter).
 
 ## When changing a skill
 
@@ -48,7 +51,7 @@ When Costory `get_skill` is wired to this repo, resolve via `skills.json` (prefe
 
 1. Create `plugins/costory/skills/<new-skill>/SKILL.md` with proper frontmatter (`name:`, `description:`).
 2. Use kebab-case folder names matching frontmatter `name`.
-3. If the skill is exposed via Costory MCP `get_skill`, add an entry to `skills.json` with a stable snake_case `id`.
+3. If the skill is exposed via Costory MCP `get_skill`, add an entry to `skills.json` whose record key and `id` equal that same kebab-case name.
 4. Minor version bump in all three version fields (see above).
 
 No `skills[]` array to maintain — discovery is automatic for Claude/Codex plugins.
@@ -71,7 +74,7 @@ Skills can reference other skills by **name** (e.g. `dashboards`, `virtual-dimen
 
 Do **not** use relative paths for cross-skill handoffs. Use skill names.
 
-Inside skill bodies that mention Costory MCP `get_skill`, keep using the MCP `skillId` (snake_case) so agents calling the tool stay correct.
+Inside skill bodies that mention Costory MCP `get_skill`, use the same kebab-case `skillId` as the folder / frontmatter `name`.
 
 ## Validation
 

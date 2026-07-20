@@ -1,6 +1,6 @@
 ---
 name: virtual-dimensions
-description: "Use when creating, editing, previewing, or publishing Costory virtual dimensions (custom cost axes) with ordered CEL rules, leftover buckets, overlap/shadowing checks, or telemetry split-by-usage allocations. Call get_skill with skillId \"virtual_dimensions\" before create_virtual_dimension_draft or update_virtual_dimension_draft."
+description: "Use when creating, editing, previewing, or publishing Costory virtual dimensions (custom cost axes) with ordered CEL rules, leftover buckets, overlap/shadowing checks, or telemetry split-by-usage allocations. Call get_skill with skillId \"virtual-dimensions\" before create_virtual_dimension_draft or update_virtual_dimension_draft."
 ---
 
 # Virtual Dimensions

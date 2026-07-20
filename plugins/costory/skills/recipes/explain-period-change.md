@@ -36,13 +36,13 @@
 }
 ```
 
-Frozen: DIGEST-only; thresholds **100 / 5% / 20**; AI summary **off** unless they ask (warn slower; if the live DIGEST widget schema exposes no summary-enable field, say it cannot be toggled via MCP and point to the web app). Period default `LAST_MONTH`; use `LAST_INVOICE_MONTH` if they mean invoice close. Comparison auto-derived — do not invent a second range.
+Frozen: DIGEST-only; thresholds **100 / 5% / 20**; AI **off** unless they ask — then set `display: "summary"` for the executive narrative and/or `enableAiInvestigation: true` for per-node deep analysis (both slower; both real DIGEST fields). Period default `LAST_MONTH`; use `LAST_INVOICE_MONTH` if they mean invoice close. Comparison auto-derived — do not invent a second range.
 
 ## Confirm before build
 
 1. Scope + period (calendar vs invoice month)
 2. Hierarchy path in plain language (root → deeper) after `suggest_groupby`
-3. AI summary yes/no
+3. AI: tree-only vs `display: "summary"` vs deep investigation (`enableAiInvestigation: true`)
 4. Headline **total before → after** agreed before digging into the breakdown
 5. Stay in chat vs NOW to a channel
 
@@ -52,6 +52,6 @@ Frozen: DIGEST-only; thresholds **100 / 5% / 20**; AI summary **off** unless the
 - Don't invent the tree; let `suggest_groupby` point at it.
 - Tune thresholds from preview `recommendations`.
 
-**Brief:** *"One-shot DIGEST on [scope] for [period], tree [root → …], AI [on/off], preview in chat [+ NOW to X if asked]."*
+**Brief:** *"One-shot DIGEST on [scope] for [period], tree [root → …], AI [tree / summary / deep], preview in chat [+ NOW to X if asked]."*
 
 **→ Hand off to `reports` (Explain)** — owns preview → optional NOW.

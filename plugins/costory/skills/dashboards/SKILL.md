@@ -1,6 +1,6 @@
 ---
 name: dashboards
-description: "Use when creating or extending Costory dashboards, generating interesting FinOps overviews (suggest_groupby + suggest_usage_metrics + text widgets), adding or replacing widgets, copying widgets between dashboards, or applying context-first inheritance for period, groupBy, metric, currency, and CEL filters. Call get_skill with skillId \"dashboards\" before create_dashboard or update_dashboard."
+description: "Use when creating or extending Costory dashboards, generating interesting FinOps overviews (suggest_groupby + suggest_usage_metrics + text widgets), adding or replacing widgets, copying widgets between dashboards, editing dashboard context (global filter / period / groupBy) via update_dashboard, or applying context-first inheritance for period, groupBy, metric, currency, and CEL filters. Call get_skill with skillId \"dashboards\" before create_dashboard or update_dashboard."
 ---
 
 # Dashboards
@@ -14,6 +14,7 @@ A **DashboardV2** has a shared **`context`** (global theme) and **widgets** that
 - Creating a new Costory dashboard
 - Generating an **interesting** overview when the user has not specified every widget (use **How to generate interesting dashboards** below)
 - Adding, replacing, or removing widgets on an existing dashboard
+- Editing dashboard `context` (global filter, period, groupBy, metric, currency) without recreating
 - Copying a widget to another dashboard
 - User asks for a cost overview "by service / by region" style dashboard
 
@@ -24,7 +25,7 @@ A **DashboardV2** has a shared **`context`** (global theme) and **widgets** that
 | `metricId` | Default cost column (e.g. `"cost"`) | Cost widgets omit `metricId` to inherit |
 | `currency` | USD, EUR, GBP, CNY | Cost widgets omit `currency` to inherit |
 | `groupBy` | Default split dimension — use when most widgets share the same axis | Cost widgets omit `groupBy` to inherit (or set `null` explicitly for totals) |
-| `datePreset` **or** `startDate`/`endDate` | Dashboard period — **required on create**. Prefer `datePreset` whenever an available preset matches the requested range | Widgets omit `from`/`to`/`datePreset` to inherit |
+| `datePreset` **or** `startDate`/`endDate` | Dashboard period — **required when chart widgets are present** (text-only dashboards may omit). Prefer `datePreset` whenever an available preset matches the requested range | Widgets omit `from`/`to`/`datePreset` to inherit |
 | `conditionsCel` | Dashboard-wide CEL filter (scope) | AND-merged into every cost widget by default |
 | `scopeId` | Optional saved scope | Inherited like other context fields |
 
@@ -149,7 +150,8 @@ Dashboard layout is a **12-column** grid. Rows grow downward.
 | Usage units for a **specific** scope (CPU hours, …) | `suggest_usage_metrics` |
 | Read existing dashboard + widget layout | `get` |
 | Create a new dashboard | `create_dashboard` |
-| Add / replace / remove widgets | `update_dashboard` |
+| Add / replace / remove widgets | `update_dashboard` (Workflow B) |
+| Patch shared `context` / global filter | `update_dashboard` with `context` (Workflow D) |
 | Run saved widget data | `get_dashboard_widget_data` |
 
 ## How to generate interesting dashboards
@@ -158,7 +160,7 @@ Use when the user wants a useful FinOps overview but has **not** listed every wi
 
 Do **not** ship a wall of identical "by service" BARs. Discover axes with tools, then mix composition, trend, comparison, usage (when scoped), and **text widgets** that explain the story.
 
-Full playbook (layout recipe, anti-patterns, extended examples): `${CLAUDE_PLUGIN_ROOT}/skills/dashboards/references/how-to-generate-interesting-dashboards.md`
+Full playbook (layout recipe, anti-patterns, extended examples): call `get_skill` with `skillId: "plugins/costory/skills/dashboards/references/how-to-generate-interesting-dashboards.md"`
 
 ### Discovery (required)
 
@@ -348,6 +350,51 @@ Build **5–8** widgets that answer different questions:
 3. `update_dashboard` on the target with `op: "add"`:
    - Pass `x`, `y`, `w`, `h` to preserve layout
    - Rebuild queries using **overrides only** relative to the **target** dashboard `context` — do not copy inherited metricId/currency/period/filter fields that the target already provides
+
+## Workflow D — Edit dashboard context
+
+Change the shared `context` (global filter, period, `groupBy`, `metricId`, `currency`, `scopeId`) **without** recreating the dashboard or rewriting widgets.
+
+1. `search` → dashboard id (optional if already known)
+2. `get` → read current `context` / `conditionsCel`
+3. `update_dashboard` with a **partial** `context` patch — omit fields you want to keep
+4. Response includes updated `inheritedContext`; `applied` is `[]` when no widget ops were passed
+5. Include the returned URL in your reply
+
+Patch semantics:
+
+| Input | Effect |
+|-------|--------|
+| Field omitted | Keep existing value |
+| Field provided | Overwrite |
+| `conditionsCel: ""` | Clear the dashboard-wide filter |
+| `conditionsCel: "<cel>"` | Replace the global filter |
+
+Chart dashboards must keep a resolvable period after the merge — do not clear `datePreset` / dates if chart widgets remain.
+
+**Example — change the global filter only:**
+
+```json
+{
+  "dashboardId": "clx9abc",
+  "context": {
+    "conditionsCel": "cos_provider in [\"AWS\"]"
+  }
+}
+```
+
+**Example — clear the global filter:**
+
+```json
+{
+  "dashboardId": "clx9abc",
+  "context": {
+    "conditionsCel": ""
+  }
+}
+```
+
+You can combine `context` with `operations` in one call (new/replaced widgets inherit the merged context).
 
 ## Per-widget overrides (complete catalog)
 
