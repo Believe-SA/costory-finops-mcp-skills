@@ -39,7 +39,7 @@
         "name": "Reallocate costs External metric",
         "prompt": "Reallocate shared cost by an external metric.",
         "path": "plugins/costory/skills/recipes/reallocate-by-external-metric.md",
-        "category": "virtual-dimensions"
+        "category": "dimension"
     },
     {
         "id": "7",
