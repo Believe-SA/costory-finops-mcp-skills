@@ -54,5 +54,47 @@
         "prompt": "Measure tag coverage and untagged spend.",
         "path": "plugins/costory/skills/recipes/untagged-coverage.md",
         "category": "reports"
+    },
+    {
+        "id": "9",
+        "name": "Prod vs R&D costs",
+        "prompt": "Explain to me my Prod vs R&D costs ?",
+        "path": "plugins/costory/skills/recipes/prod-vs-rnd-explore.md",
+        "category": "explore"
+    },
+    {
+        "id": "10",
+        "name": "Budget vs actual daily",
+        "prompt": "Generate me a dashboard to follow budget vs actual per day ?",
+        "path": "plugins/costory/skills/recipes/budget-vs-actual-dashboard.md",
+        "category": "budget"
+    },
+    {
+        "id": "11",
+        "name": "Credits YTD",
+        "prompt": "How much credits did we receive this year ?",
+        "path": "plugins/costory/skills/recipes/credits-ytd-explore.md",
+        "category": "explore"
+    },
+    {
+        "id": "12",
+        "name": "EC2 +10% spike alert",
+        "prompt": "Warn me if cost of AmazonEC2 increases by more than 10% compared to the trailing 7 days.",
+        "path": "plugins/costory/skills/recipes/ec2-cost-spike-alert.md",
+        "category": "alerts"
+    },
+    {
+        "id": "13",
+        "name": "Prod vs R&D virtual dimension",
+        "prompt": "Can you help me build a virtual dimension to split my production from R&D costs ?",
+        "path": "plugins/costory/skills/recipes/prod-vs-rnd-vdim.md",
+        "category": "virtual-dimensions"
+    },
+    {
+        "id": "14",
+        "name": "Compute drill-down dimension",
+        "prompt": "What dimension can i use to drill down compute costs ?",
+        "path": "plugins/costory/skills/recipes/compute-drilldown-dimension.md",
+        "category": "dimension"
     }
 ]
