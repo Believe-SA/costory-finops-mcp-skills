@@ -5,7 +5,7 @@ description: "Use when creating, previewing, updating, scheduling, or exploring 
 
 # Reports
 
-**Skill body version 0.5.0.** Workflows here are **named** — Schedule, Explain, Update, Run, Explore. Older bodies lettered them A–E, and other Costory surfaces used a different letter order. If you are holding a lettered routing table for reports, it is stale: route by the names in this body and ignore the letters.
+**Skill body version 0.5.1.** Workflows here are **named** — Schedule, Explain, Update, Run, Explore. Older bodies lettered them A–E, and other Costory surfaces used a different letter order. If you are holding a lettered routing table for reports, it is stale: route by the names in this body and ignore the letters.
 
 A **report** has a shared **`context`** (global theme) and **widgets** that inherit it by default. It delivers those widgets (chart snapshot, PDF, top/flop, text, or **DIGEST** cost-change tree) to one or more destinations (Slack, Teams, email). Same mental model as dashboards: shared `context` + per-widget overrides. `create_report`, `update_report`, and `preview_report_widget` all take the same report-level `context`.
 
@@ -13,7 +13,7 @@ A **report** has a shared **`context`** (global theme) and **widgets** that inhe
 
 ## Must-follow rules
 
-Everything below this section is detail. These seven are the contract:
+Everything below this section is detail. These eight are the contract:
 
 1. **Ask before build (Schedule / delivery).** Do not pick widgets, call `preview_report_widget`, or call `create_report` until the design is confirmed. Never silently default to a graph or an AI summary on Schedule.
 2. **Explain exception — preview-first DIGEST.** For one-shot *"what changed / explain last month"* (Explain workflow or `explain-period-change` recipe), **defaulting to DIGEST chat preview is required.** Do not wait for a full design questionnaire; do not substitute `query` + `compare` for the first answer.
@@ -22,6 +22,7 @@ Everything below this section is detail. These seven are the contract:
 5. **AI features are opt-in.** DIGEST-only. Set `display: "summary"` for the executive narrative and/or `enableAiInvestigation: true` for per-node deep analysis — both default off (tree-only) and are slower.
 6. **Confirm delivery.** Both `NOW` and `SCHEDULED` need explicit confirmation before `create_report`. `UNSCHEDULED` does not.
 7. **`datePreset`, never frozen dates,** on `SCHEDULED` reports.
+8. **Cost data is ~2 days late.** Prefer a **Tuesday** weekly send (`weekday: 2`) when the period is `LAST_WEEK` (a completed calendar week). If the report must land earlier (e.g. Monday), use `TRAILING_7_DAYS` instead of `LAST_WEEK` so the window is not a half-empty calendar week.
 
 ## Routing
 
@@ -74,8 +75,8 @@ Present 3–5 options as a friendly menu (value prop first, then widgets). Invit
 | Starter | Plain-language pitch | Widgets | Typical schedule / presets |
 |---------|----------------------|---------|----------------------------|
 | Monthly cost digest | "What changed last month?" — ranked movers as a tree; optional AI narrative for execs | DIGEST (± optional AI summary) | MONTHLY · `LAST_MONTH` |
-| Weekly team pulse | "What blew up or dropped for each team last week?" | TOP_FLOP ± GRAPH_SNAPSHOT | WEEKLY · `LAST_WEEK` / `TRAILING_14_WEEKS` |
-| Migration / spend tracker | "Are we on track?" — trend over weeks + last-week movers | GRAPH_SNAPSHOT + TOP_FLOP | WEEKLY · GRAPH `TRAILING_14_WEEKS`, TOP_FLOP `LAST_WEEK` |
+| Weekly team pulse | "What blew up or dropped for each team last week?" | TOP_FLOP ± GRAPH_SNAPSHOT | WEEKLY · Tuesday + `LAST_WEEK` (or Monday + `TRAILING_7_DAYS`) / `TRAILING_14_WEEKS` |
+| Migration / spend tracker | "Are we on track?" — trend over weeks + last-week movers | GRAPH_SNAPSHOT + TOP_FLOP | WEEKLY · Tuesday · GRAPH `TRAILING_14_WEEKS`, TOP_FLOP `LAST_WEEK` (or `TRAILING_7_DAYS` if not Tuesday) |
 | Dashboard pack | "Send our existing FinOps dashboard on a cadence" | DASHBOARD_PDF | WEEKLY + weekday · period lives on the dashboard |
 | Invoice / finance close | "Close the books on what moved last invoice month" | DIGEST (± DASHBOARD_PDF; optional AI summary) | MONTHLY · `LAST_INVOICE_MONTH` or `LAST_MONTH` |
 
@@ -90,7 +91,7 @@ Fill only what is still missing — keep it conversational:
 1. **Scope** — whole org, `scopeId` from `list_teams`, and/or `conditionsCel`
 2. **Split / hierarchy** — if DIGEST is in the mix: confirm root + deeper levels, or run `suggest_groupby` and propose a tree in plain language
 3. **Optional AI** (DIGEST only) — ask explicitly: executive narrative (`display: "summary"`) and/or per-node investigation (`enableAiInvestigation: true`); both slower; default tree-only (`display: "tree"`, investigation off)
-4. **Cadence details** — WEEKLY needs `weekday` (0 = Sunday … 6 = Saturday); set `firstRunAt` (ISO-8601 UTC); use presets that roll forward (`LAST_WEEK`, `LAST_MONTH`, …). Refuse frozen `from`/`to` on SCHEDULED reports
+4. **Cadence details** — WEEKLY needs `weekday` (0 = Sunday … 6 = Saturday); set `firstRunAt` (ISO-8601 UTC); use presets that roll forward (`LAST_WEEK`, `TRAILING_7_DAYS`, `LAST_MONTH`, …). Refuse frozen `from`/`to` on SCHEDULED reports. **Data lag:** billing/cost data is typically ~2 days behind. For a calendar-week pulse, default `weekday: 2` (Tuesday) with `LAST_WEEK`. If they insist on Monday (or another early weekday), switch the period to `TRAILING_7_DAYS` — do not pair Monday + `LAST_WEEK` (that full week still has incomplete late days).
 5. **Currency / metric** — usually `cost` + org currency from `get_context`
 
 The channel **type** is already known from step 1; the concrete destination is resolved at build time, not here.
@@ -200,7 +201,7 @@ At preview, create, and each scheduled run:
 Consequences worth knowing:
 
 - **Similarity rule:** when widgets share a period, split, metric, currency, or scope, put it in `context` first. Widget fields are exceptions only.
-- **Per-widget periods are normal** — e.g. GRAPH = `TRAILING_14_WEEKS`, TOP_FLOP = `LAST_WEEK`. Keep shared fields on `context`; override only `datePreset` (and presentation) on the widget.
+- **Per-widget periods are normal** — e.g. GRAPH = `TRAILING_14_WEEKS`, TOP_FLOP = `LAST_WEEK` (Tuesday send) or `TRAILING_7_DAYS` (earlier weekday). Keep shared fields on `context`; override only `datePreset` (and presentation) on the widget.
 - **Never combine** `datePreset` with explicit dates on the same layer.
 - **`conditionsCel` is report-wide** — do not repeat it inside every widget `filterCel`.
 - **TEXT and DASHBOARD_PDF do not inherit query fields.** PDF period lives on the referenced dashboard; TEXT is static markdown in `contentMarkdown` (not dashboard `textContent`).
@@ -344,7 +345,7 @@ Tune from `recommendations`: thresholds, `topLargestAbsoluteChange` (only 5, 10,
 
 **`create_report` / `update_report` — same DIGEST goes in `widgets` (plural array).**
 
-**Migration tracker (graph + top/flop — not DIGEST):**
+**Migration tracker (graph + top/flop — not DIGEST).** Pair with `schedule.weekday: 2` (Tuesday) when using `LAST_WEEK`; if the send day is Monday, set `context.datePreset` to `TRAILING_7_DAYS` instead:
 
 ```json
 {
@@ -439,6 +440,7 @@ The conversation rules live in **Must-follow rules** above. These are the shape 
 - Do not substitute destinations silently
 - Do not use `query` + `compare` as a substitute for Explain’s DIGEST preview on the first answer
 - Do not rebuild DIGEST movers as explorer tables or a canvas before presenting preview fields
+- Do not schedule a weekly `LAST_WEEK` report for Monday (`weekday: 1`) — cost data is ~2 days late; use Tuesday (`weekday: 2`) with `LAST_WEEK`, or keep Monday and switch to `TRAILING_7_DAYS`
 
 ## Related skills
 
