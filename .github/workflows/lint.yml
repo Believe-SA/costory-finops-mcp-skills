@@ -72,7 +72,7 @@ jobs:
       - name: Validate recipes index.json
         run: |
           set -e
-          index=plugins/costory/skills/recipes/recipes/index.json
+          index=plugins/costory/skills/recipes/index.json
           jq empty "$index"
           bad=$(jq -r '.[] | select((.id | type != "string" or length == 0)
                                  or (.name | type != "string" or length == 0)
@@ -94,7 +94,10 @@ jobs:
               exit 1
             }
           done
-          for f in plugins/costory/skills/recipes/recipes/*.md; do
+          # SKILL.md is the recipes catalog (listed in skills.json), not a chat
+          # suggestion card — only *.md recipe cards must appear in index.json.
+          for f in plugins/costory/skills/recipes/*.md; do
+            [ "$(basename "$f")" = "SKILL.md" ] && continue
             jq -e --arg f "$f" 'any(.[]; .path == $f)' "$index" > /dev/null || {
               echo "::error file=$index::recipe file $f is not listed in index.json"
               exit 1
