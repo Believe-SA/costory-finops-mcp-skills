@@ -1,6 +1,6 @@
 # finops-mcp-skills
 
-Costory FinOps agent skills for virtual dimensions, dashboards, and reports. Packaged as a Claude Code / Codex marketplace plugin (same layout as [tsuga-dev/agent-plugins](https://github.com/tsuga-dev/agent-plugins)), and indexed for Costory MCP `get_skill`.
+Costory FinOps agent skills for virtual dimensions, dashboards, and reports. Packaged as a Claude Code / Codex marketplace plugin
 
 ## Layout
 
