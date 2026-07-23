@@ -24,6 +24,10 @@ plugins/costory/
 | `reports` | DIGEST and other reports: preview, schedule, delivery safety |
 | `query` | Cost / usage / metric investigation workflows |
 | `recipes` | Outcome-based FinOps tracking designs → hand off to mechanics |
+| `events` | Correlate cost movements with deploys/incidents; annotate cost changes |
+| `recommendations` | Derive + prioritize + quantify savings actions from the data |
+| `alerts` | Standing cost / anomaly monitors (preview-first, create-only) |
+| `playbooks` | Multi-step orchestration across skills (e.g. spend-spike triage) |
 
 ## Install (Claude Code / Codex)
 

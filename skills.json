@@ -1,5 +1,5 @@
 {
-  "version": "0.8.4",
+  "version": "0.9.0",
   "skills": {
     "recipes": {
       "id": "recipes",
@@ -30,6 +30,30 @@
       "name": "query",
       "path": "plugins/costory/skills/query/SKILL.md",
       "description": "Explore Costory cost, usage, metric, formula, budget, and external-metric data. Explorer PoP only — hand off change-tree \"what changed\" asks to explain-period-change / reports Explain."
+    },
+    "events": {
+      "id": "events",
+      "name": "events",
+      "path": "plugins/costory/skills/events/SKILL.md",
+      "description": "Correlate cost movements with engineering/business events and annotate cost changes: create_event (with a widget annotation chart), list_events to tie a spike to a deploy/incident, update_event."
+    },
+    "recommendations": {
+      "id": "recommendations",
+      "name": "recommendations",
+      "path": "plugins/costory/skills/recommendations/SKILL.md",
+      "description": "Derive a prioritized, quantified savings action plan analytically from query (effective savings, K8s waste, coverage) — grounded in observed figures, never invented. suggest_actions is UI next-steps only; there is no dedicated recommendation engine."
+    },
+    "alerts": {
+      "id": "alerts",
+      "name": "alerts",
+      "path": "plugins/costory/skills/alerts/SKILL.md",
+      "description": "Create standing cost alerts / anomaly monitors: preview_alert to backtest a condition (rollingSum/timeShift/…) before create_alert; dedup, destinations-last, create-only (edit in UI)."
+    },
+    "playbooks": {
+      "id": "playbooks",
+      "name": "playbooks",
+      "path": "plugins/costory/skills/playbooks/SKILL.md",
+      "description": "Multi-step orchestration across skills/recipes with confirm-gates: spend-spike-triage, monthly-close, allocation-campaign, unit-economics-rollout. For a single-skill outcome use recipes instead."
     }
   }
 }
