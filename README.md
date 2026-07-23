@@ -28,6 +28,9 @@ plugins/costory/
 | `recommendations` | Derive + prioritize + quantify savings actions from the data |
 | `alerts` | Standing cost / anomaly monitors (preview-first, create-only) |
 | `playbooks` | Multi-step orchestration across skills (e.g. spend-spike triage) |
+| `forecast` | Run-rate / budget-pace projection; points to in-product statistical forecast |
+| `governance` | FinOps policy & SLO adherence (coverage, budget, commitment, tagging) |
+| `optimization` | Method to find + size a saving lever (rightsizing, commitments, waste) |
 
 ## Install (Claude Code / Codex)
 
