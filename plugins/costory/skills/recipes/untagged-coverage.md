@@ -122,7 +122,7 @@ Adjust tagged leg if "tagged" means a specific value (`[TAG_FIELD] == "[EXPECTED
     }
   ],
   "destinations": [{
-    "destinationType": "[SLACK|TEAMS|EMAIL]",
+    "destinationType": "[SLACK|TEAMS]",
     "channelId": "[DESTINATION_ID]"
   }]
 }

@@ -67,4 +67,4 @@ The *"are we within policy?"* capability. Where the other skills answer a number
 - `alerts` — standing budget / anomaly / tagging monitors
 - `forecast` — budget-pace adherence
 - `recommendations` — remediation once an SLO is missed
-- `recipes` → (playbook) `allocation-campaign` — the coverage-SLO rollout end to end
+- `playbooks` → `allocation-campaign` — the coverage-SLO rollout end to end

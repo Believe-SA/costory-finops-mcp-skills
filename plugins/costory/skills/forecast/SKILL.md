@@ -7,7 +7,7 @@ description: "Use when the user asks whether they are on pace to overspend, what
 
 Project where spend is heading. **Read this first:** the Costory **MCP surface has no statistical/ML forecast tool** — so this skill does **run-rate / pace projection** from actuals (arithmetic you can show), plus regression detection via `alerts`. Costory's *product* has a forecasting feature; for a real statistical forecast, point the user there. **Never fabricate a projected figure** beyond simple run-rate math whose inputs you pulled from `query`.
 
-This is the honest boundary of Forecasting on the MCP today (a known product-vs-MCP gap; see [`../../knowledge/customer-foundation/entities.md`](../../knowledge/customer-foundation/entities.md) → Forecast).
+This is the honest boundary of Forecasting on the MCP today — a known product-vs-MCP gap (Forecast is not modeled as an MCP tool).
 
 **Load this skill first** for "are we on pace?", "what will we spend this month?", or "project this trend".
 

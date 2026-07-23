@@ -75,6 +75,12 @@ bd dep add costory-finops-mcp-skills-aj9 costory-finops-mcp-skills-zzi        # 
 bd dep add costory-finops-mcp-skills-8le costory-finops-mcp-skills-aj9        # phase 5 <- phase 4
 ```
 
+## Review pass (post-Phase-5, v0.10.1)
+
+Full all-skills review via the `costory-skills-review` workflow (38 agents, adversarial verify). **17 verified findings fixed** in one pass (playbook misroutes, dead links, `reports` `cos_environment`, EMAIL destination shape across reports + 5 recipes, reallocate telemetry-datasource accuracy, `events` confirm-gate, stale `entities.md`, packaging descriptions). **22 backlog issues filed live in beads** (21 state-of-the-art opportunities + 1 deferred `team`-groupBy bug `…-6ac`) — see [`finops-kb-review-issues.md`](./finops-kb-review-issues.md).
+
+**Still to replay when the (intermittent) Dolt lock frees** — the Phase 1–5 completion closes + dep edges below did not persist this session:
+
 ## Phase 2 — how it works (for the next contributor)
 
 The render mechanism is **live and proven** on one convention. To migrate another:

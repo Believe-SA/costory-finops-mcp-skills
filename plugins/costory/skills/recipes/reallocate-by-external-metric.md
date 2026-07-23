@@ -2,7 +2,7 @@
 
 **When:** *"reallocate shared cost by usage"*, *"split the platform bill by requests / CPU / revenue"*, *"unit economics with an external metric"*, *"showback by business driver"* — proportional allocation, not just cost ÷ metric in Explorer.
 **Audience:** FinOps / platform / product ops defining fair shared-cost showback.
-**Outcome:** a **telemetry virtual dimension** that splits in-scope spend by an external or saved usage metric, after validating unit economics in `query`.
+**Outcome:** a **telemetry virtual dimension** that splits in-scope spend by a **saved usage-metric datasource**, after validating unit economics in `query` (a live external metric can validate the driver but cannot back the telemetry allocation — save it as a Costory metric first).
 
 ## Tool sequence
 
@@ -55,7 +55,7 @@ Prefer saved `{ type: "metric" }` when one exists; otherwise use `externalMetric
 }
 ```
 
-**Live external (Tsuga) — after `list_metrics` with `includeExternal: true`:**
+**Live external (Tsuga) — validation only (cannot back the telemetry VDIM); after `list_metrics` with `includeExternal: true`:**
 
 ```json
 {
@@ -125,7 +125,7 @@ Frozen: use `telemetry` allocation (not manual weights); map significant metric 
 ## Confirm before build
 
 1. Which shared spend is in scope (`[SCOPE_CEL]`)
-2. Which metric drives the split (saved id vs external integration)
+2. Which **saved usage-metric datasource** drives the split (a live external integration validates the driver in `query` but cannot back the telemetry allocation)
 3. Which dimension / groupBy aligns cost with metric volume
 4. Proposed mapping table (metric value → bucket label) — user approves before draft
 5. Acceptable leftover % after `preview_virtual_dimension_draft`
@@ -135,6 +135,7 @@ Frozen: use `telemetry` allocation (not manual weights); map significant metric 
 
 - **Unit economics in `query` ≠ reallocation.** Cost ÷ metric validates the driver; the VDIM performs proportional **split** of dollars.
 - Do not call `list_metrics` with `includeExternal: true` without a search term.
+- Telemetry allocation needs a **saved usage-metric datasource** (`list_metrics { datasourceId }`), not a live external integration — a Tsuga/BigQuery live metric validates the driver in `query`, but must be saved as a Costory metric before its datasource can back the split.
 - Mapping keys are metric **value names**, not `cos_*` CEL fields — discover via `query` on the metric with `groupBy`.
 - If leftover share stays high after preview, add mapping entries for the largest unmapped values or narrow `[SCOPE_CEL]`.
 - After publish, poll `computeStatus` until `COMPLETED` before using `bqName` in dashboards/reports.

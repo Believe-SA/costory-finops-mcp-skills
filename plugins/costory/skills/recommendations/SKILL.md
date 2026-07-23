@@ -40,7 +40,7 @@ Turn Costory cost data into a **prioritized, quantified action plan**: what to c
 
 1. **Scope** the question (whole org, a team/scope, a service) as `filterCel`
 2. **Derive candidates** — run the backing `query` for each relevant class above; keep only opportunities with a real, observed gap
-3. **Quantify** each: estimated saving from the observed figures (see the formulas in `metrics.md` / `query` H & G). State the basis period and that it is an **estimate**
+3. **Quantify** each: estimated saving from the observed figures (see `query` Workflow H — `contracted_cost` − `effective_cost`, and Workflow G — `k8s_waste` / `k8s_cost`). State the basis period and that it is an **estimate**
 4. **Prioritize** — rank by `estimatedSaving × confidence ÷ effort`. Lead with the biggest, most confident, lowest-effort wins
 5. **Explain** each recommendation: the evidence (the number and where it came from), the action, the estimated impact, and the risk/effort
 6. Offer to operationalize: a standing `alerts` monitor, an `events` annotation when acted on, a tracking dashboard/report
@@ -86,4 +86,4 @@ Each item, most-impactful first:
 - `recipes` → `untagged-coverage` — the allocation-coverage input
 - `alerts` — make an accepted recommendation self-monitoring
 - `events` — annotate when a recommendation is acted on, to track its effect
-- `recipes` → (playbook) `spend-spike-triage` — recommendations are the "estimate savings" step of the flagship loop
+- `playbooks` → `spend-spike-triage` — recommendations are the "estimate savings" step of the flagship loop

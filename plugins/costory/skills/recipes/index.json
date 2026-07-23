@@ -1,7 +1,7 @@
 [
     {
         "id": "1",
-        "name": "Weekly Environment Costs",
+        "name": "Monthly Environment Costs",
         "prompt": "Schedule a report to track cost by environment for leadership.",
         "path": "plugins/costory/skills/recipes/env-costs-cto.md",
         "category": "reports"
