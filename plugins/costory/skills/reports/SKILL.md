@@ -5,7 +5,7 @@ description: "Use when creating, previewing, updating, scheduling, or exploring 
 
 # Reports
 
-**Skill body version 0.5.1.** Workflows here are **named** — Schedule, Explain, Update, Run, Explore. Older bodies lettered them A–E, and other Costory surfaces used a different letter order. If you are holding a lettered routing table for reports, it is stale: route by the names in this body and ignore the letters.
+**Skill body version 0.5.2.** Workflows here are **named** — Schedule, Explain, Update, Run, Explore, Inventory. Older bodies lettered them A–E, and other Costory surfaces used a different letter order. If you are holding a lettered routing table for reports, it is stale: route by the names in this body and ignore the letters.
 
 A **report** has a shared **`context`** (global theme) and **widgets** that inherit it by default. It delivers those widgets (chart snapshot, PDF, top/flop, text, or **DIGEST** cost-change tree) to one or more destinations (Slack, Teams, email). Same mental model as dashboards: shared `context` + per-widget overrides. `create_report`, `update_report`, and `preview_report_widget` all take the same report-level `context`.
 
@@ -34,6 +34,7 @@ Everything below this section is detail. These eight are the contract:
 | Update an existing report | **Update** |
 | Run / retry / transfer / archive | **Run** |
 | Explore a delivered DIGEST execution | **Explore** |
+| "What reports do we have?" / scheduled vs one-off / which failed | **Inventory** |
 
 If intent is ambiguous between Schedule and Explain, ask: **recurring delivery to a channel**, or **one-shot explanation of last month's costs?**
 
@@ -162,11 +163,35 @@ Do not skip to a graph-only report for this trigger — the core ask is explanat
 
 ## Workflow: Run — run, retry, transfer, archive
 
-Retry **failed executions only** — never `run_report_now` to fix one destination. Do not poll executions in an unbounded loop.
+**Triggers:** send a report now; retry a failed delivery; re-send an existing execution elsewhere; archive a report.
+
+Every tool here has a real-world side effect — a message is sent, or a report is deleted. Each is a **DANGER ZONE**: state exactly what will happen and to which destinations (from `get` / `get_report_execution`), then get explicit confirmation before the call.
+
+| Intent | Tool | What it does | Confirm first |
+|--------|------|--------------|---------------|
+| Send this report now | `run_report_now` | Sends to **every** configured destination immediately | `get` the report; read back its name + full destination list |
+| One destination failed | `retry_report_execution` | Re-sends **one failed delivery only** (`executionId`) | `get_report_execution`; name the failed execution + its destination |
+| Re-send a good execution elsewhere | `transfer_report_execution` | Re-delivers an already-rendered **successful** execution to new destinations, no recompute | `list_available_destinations` for the target type; read back every target |
+| Delete a report | `archive_report` | Soft delete — **no MCP restore** | Confirm the report name; there is no undo here |
+
+- **Never `run_report_now` to recover a partial failure.** It re-sends to *all* destinations, duplicating messages to the ones that already succeeded. Use `retry_report_execution` for the single failed delivery — it is scoped to that one execution.
+- `transfer_report_execution` reuses the already-rendered widgets — it does **not** recompute, so the numbers match the original send. Use it to forward a good report to another channel, not to refresh stale data (re-run the report for fresh data). Its `destinations` use the create shape: `{ destinationType: "SLACK" | "TEAMS", channelId }` or `{ destinationType: "EMAIL", email }` — and a Slack `channelId` may be a `C…` channel **or** a `U…` user id (direct message).
+- Do not poll executions in an unbounded loop.
 
 ## Workflow: Explore — delivered DIGEST
 
 `get_report_execution` → `get_report_execution_widget` with `view: "tree"` for the full formatted tree.
+
+## Workflow: Inventory — what reports exist
+
+**Triggers:** "what reports do we have?"; "which reports are scheduled vs one-off?"; "which reports failed / are unhealthy?".
+
+`list_reports` returns compact summaries — `id`, `name`, `kind` (`SCHEDULED` / `ONE_TIME`), `status`, `nextRunDate`, destination counts, and `lastRunHealth`. Read-only, no confirmation needed.
+
+- **What do we have / scheduled vs one-off** → `list_reports` (add `kind: "SCHEDULED"` or `kind: "ONE_TIME"` — "one-off" maps to `ONE_TIME` — and `teamId` to scope to one team). Group the answer by `kind`.
+- **Which failed / are unhealthy** → `list_reports`, then surface the reports whose `lastRunHealth` is unhealthy by name + `nextRunDate` so the user knows what will re-send next.
+- Archived reports are hidden by default — pass `includeArchived: true` only when the user asks about archived/deleted reports.
+- `list_reports` is the inventory index, not per-execution detail: drill into a report's config with `get`, and into a single delivery with `get_report_execution` (see **Explore**).
 
 ---
 
@@ -424,7 +449,7 @@ Tune from `recommendations`: thresholds, `topLargestAbsoluteChange` (only 5, 10,
 }
 ```
 
-**Destination shapes** (resolve via `list_available_destinations`): `SLACK` and `TEAMS` use `{ "destinationType": …, "channelId": … }` — a Slack `channelId` is a `C…` channel or a `U…` DM. **`EMAIL` uses a different key:** `{ "destinationType": "EMAIL", "email": "<address>" }` (or `"ALL_ACTIVE_USERS"` to fan out) — never `channelId`.
+**Destination shapes** (resolve via `list_available_destinations`): `SLACK` and `TEAMS` use `{ "destinationType": …, "channelId": … }`. For **Slack**, `channelId` is either a `C…` channel id **or** a `U…` user id — a `U…` id delivers a **direct message (DM)** to that user, not a channel post, so read the target back by name (channel vs DM) before confirming. **`EMAIL` uses a different key:** `{ "destinationType": "EMAIL", "email": "<address>" }` (or `"ALL_ACTIVE_USERS"` to fan out) — never `channelId`. The same shapes apply to `transfer_report_execution` destinations.
 
 ## Payload anti-patterns
 

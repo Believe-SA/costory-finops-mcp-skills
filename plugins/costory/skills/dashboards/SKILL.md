@@ -92,6 +92,25 @@ Prefer `datePreset` on the dashboard (or widget) + `compare: {}` for "vs previou
 }
 ```
 
+**Choosing `compare.chartType`:**
+
+| `compare.chartType` | Shows | Use when the user wants… |
+|---------------------|-------|---------------------------|
+| `WATERFALL` (default) | Per-group contribution to the delta (bridge) | "what drove the change", top movers |
+| `TABLE` | Old / new / delta / % per group | a ranked, detailed breakdown |
+| `KPI_BREAKDOWN` | Headline total + its delta as a compact tile | a scorecard "is it up or down, and by how much" — not per-group drivers |
+
+Reach for `KPI_BREAKDOWN` when the answer is a single MoM/WoW number (e.g. a top-of-dashboard "total spend vs last period" tile), and `WATERFALL`/`TABLE` when the user wants the per-group movers behind it. Note: `KPI_BREAKDOWN` and `TABLE` comparison widgets cannot be exported as PNG (see **Workflow E**).
+
+```json
+{
+  "title": "Spend vs last period",
+  "queries": [{ "type": "cost", "name": "a", "chartType": "BAR" }],
+  "aggBy": "Period",
+  "compare": { "chartType": "KPI_BREAKDOWN" }
+}
+```
+
 Rules of thumb:
 
 - Default to **time series** for overview dashboards and monitoring (spend over the last 30/90 days).
@@ -152,7 +171,8 @@ Dashboard layout is a **12-column** grid. Rows grow downward.
 | Create a new dashboard | `create_dashboard` |
 | Add / replace / remove widgets | `update_dashboard` (Workflow B) |
 | Patch shared `context` / global filter | `update_dashboard` with `context` (Workflow D) |
-| Run saved widget data | `get_dashboard_widget_data` |
+| Read a saved widget's numbers by id | `get_dashboard_widget_data` (Workflow F) |
+| Render a saved widget as a PNG to embed / share in Slack | `get_dashboard_widget_image` (Workflow E) |
 
 ## How to generate interesting dashboards
 
@@ -395,6 +415,31 @@ Chart dashboards must keep a resolvable period after the merge — do not clear 
 ```
 
 You can combine `context` with `operations` in one call (new/replaced widgets inherit the merged context).
+
+## Workflow E — Share a widget as an image
+
+Render a saved widget as a PNG (uploaded to GCS) to embed in a chat reply or paste into Slack. There is no separate share URL — link to the dashboard when the user wants the live chart.
+
+1. `search` / `get` → `dashboardId` + `widgetId`
+2. `get_dashboard_widget_image` → `imageUrl` (GCS PNG) plus, by default, the PNG bytes inline (pass `includeBinaryImage: false` for URLs only)
+3. Embed the image and/or link the dashboard in your reply
+
+The dashboard `conditionsCel` merge is applied exactly as in Workflow F. Text and table-only widgets return `UNSUPPORTED_WIDGET`; comparison widgets rendered as `KPI_BREAKDOWN` or `TABLE` also cannot export (see the `compare.chartType` note above) — switch the widget to `WATERFALL` or a chart series first.
+
+```json
+{ "dashboardId": "clx9abc", "widgetId": "wid_123" }
+```
+
+## Workflow F — Read a saved widget's numbers
+
+"Show me the numbers behind the X widget." Re-run a saved widget by id — no need to re-specify the query config.
+
+1. `get` (or the `get_context` widgets list) → `dashboardId` + `widgetId`
+2. `get_dashboard_widget_data` → the same series / `timeSeries` (or comparison breakdown) as the `query` tool, with the dashboard `conditionsCel` applied unless the widget sets `extendDashboardConditions: false`
+
+```json
+{ "dashboardId": "clx9abc", "widgetId": "wid_123" }
+```
 
 ## Per-widget overrides (complete catalog)
 

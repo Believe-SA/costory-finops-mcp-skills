@@ -14,7 +14,7 @@ A **recipe** is a ready-made design for a common FinOps tracking goal — scope,
 3. Run the card's **Tool sequence** through confirm gates — do not fire mutation/delivery tools until confirmed.
 4. Fill `[PLACEHOLDERS]` from discovery + user answers; keep frozen fields as written.
 5. Restate the **Brief**, then hand off the filled skeleton to the named mechanics skill.
-6. If nothing matches → fall through to `reports` (or the relevant mechanics skill) and design from scratch.
+6. If nothing matches → route via **Beyond recipes** below (a capability skill or the `playbooks` router), or fall through to `reports` and design from scratch.
 
 ## Skeleton contract
 
@@ -66,6 +66,34 @@ Read the matching file. Do not improvise a blend of two cards until the user ask
 | "cost per request" KPI vs **reallocate** shared spend by requests | unit economics only → `query`; proportional split → `reallocate-by-external-metric` |
 | "credits this year" **total** vs credits **runway report** | `credits-ytd-explore` vs `provider-credits` |
 | "budget vs actual" **dashboard** vs quick Explorer numbers | `budget-vs-actual-dashboard` vs `query` Workflow F |
+
+## Beyond recipes — capability skills & playbooks
+
+Recipe cards are pre-built *designs* for common goals. When the user states an **outcome** that no card fits, route to the **capability skill** that owns that outcome (each loads via `get_skill`), or to the **`playbooks`** router when the goal needs several skills chained in sequence.
+
+| The user wants… | Route to |
+|-----------------|----------|
+| To correlate a cost move with a deploy / migration / incident, or annotate a change | `events` |
+| A prioritized, quantified savings **action plan** ("what should we do") | `recommendations` |
+| The analytical **method** to size one saving lever (rightsizing, commitment coverage, waste) | `optimization` |
+| A standing **alert** / anomaly monitor that notifies on a spend condition | `alerts` |
+| "Are we **on pace**?" / projected month-end or period-end spend | `forecast` |
+| Policy / **SLO** / coverage-target adherence (tag coverage %, commitment coverage) | `governance` |
+| Cost **per unit of work** (cost/request, cost/customer, cost/build) | `unit-economics` |
+| A Costory **product-documentation** question ("how does X work in the UI") | `docs` |
+| A multi-step **investigation or rollout** chaining several of the above | `playbooks` |
+
+### Cross-skill disambiguation
+
+The five action-oriented capability skills have overlapping triggers. Separate them by the *verb* in the ask:
+
+| Sound alike | Prefer |
+|-------------|--------|
+| "what should we do to save" — a **ranked, cross-lever plan** | `recommendations` |
+| "how do I compute the saving on **this one lever**" (break-even, idle, coverage sizing) | `optimization` |
+| "are we hitting our coverage / commitment **target** (SLO)?" — policy adherence | `governance` |
+| "are we **on pace** to overspend?" / "**projected** month-end spend" | `forecast` |
+| "**notify** me when spend spikes / breaches a threshold" — standing monitor | `alerts` |
 
 ## Notes on presets
 

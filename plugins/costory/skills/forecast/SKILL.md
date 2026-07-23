@@ -88,3 +88,4 @@ For "warn me if spend trends up", this is a standing monitor, not a one-shot pro
 - `recipes` → `budget-vs-actual-dashboard` — persist the pace view
 - `alerts` — standing regression detection
 - `recommendations` — if the projection shows overspend, derive actions to bend the curve
+- `docs` — for a true statistical forecast, use it to reach the in-product **Forecasting with TimesFM** feature

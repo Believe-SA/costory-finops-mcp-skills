@@ -72,4 +72,4 @@ Frozen: service filter `cos_service_name in ["AmazonEC2"]` (extend CEL only if u
 
 **Brief:** *"Alert: AmazonEC2 7-day sum > prior 7-day × 1.1, dedup [WEEK|…], to [channel] (previewed)."*
 
-**→ Hand off:** no separate mechanics skill — execute with `preview_alert` → `create_alert` after confirm. Use `query` only to sanity-check EC2 baseline if preview looks wrong.
+**→ Hand off to `alerts`** — owns the `preview_alert` → `create_alert` mechanics (condition grammar, dedup, destinations-last, create-only). Bring the frozen defaults above. Use `query` only to sanity-check the EC2 baseline if preview looks wrong.
