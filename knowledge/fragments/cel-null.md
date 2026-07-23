@@ -1,0 +1,1 @@
+- Null labels are CEL `null` — use `== null` / `!= null`, never `is_null` or the string `"null"`.

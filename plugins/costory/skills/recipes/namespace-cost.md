@@ -67,7 +67,9 @@ Frozen: `groupBy` = `cos_namespace_reallocated`; `conditionsCel` = `cos_namespac
 
 ## Gotchas
 
-- CEL null-exclusion is `!= null` — **not** `is_null`, **not** the string `"null"`.
+<!-- BEGIN foundation:cel-null -->
+- Null labels are CEL `null` — use `== null` / `!= null`, never `is_null` or the string `"null"`.
+<!-- END foundation:cel-null -->
 - Prefer `cos_namespace_reallocated` over raw namespace labels when the org uses reallocation.
 - Weekly beats monthly here — K8s workloads change fast.
 

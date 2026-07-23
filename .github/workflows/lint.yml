@@ -128,6 +128,14 @@ jobs:
           done
           if [ -s "$violations" ]; then cat "$violations"; exit 1; fi
 
+      - name: Managed foundation blocks match their knowledge/ source
+        run: |
+          # Runtime-critical conventions are authored once under
+          # knowledge/fragments/ and rendered inline into self-contained skills.
+          # This fails the PR if a rendered block drifts from its source — run
+          # scripts/render-foundation.py and commit to fix.
+          python3 scripts/render-foundation.py --check
+
       - name: SKILL.md descriptions must be <= 1024 chars (Codex drops longer ones)
         run: |
           set -e
