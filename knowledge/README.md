@@ -12,10 +12,29 @@ The `plugins/costory/skills/*/SKILL.md` bodies re-teach the same conventions (th
 
 Therefore this directory is a **source**, not a runtime dependency:
 
-- **Runtime-critical conventions** (needed inline for a skill to work) are authored here and **rendered** into each `SKILL.md` as a generated block. Do **not** replace the inline copy with a link — that would break delivery. *(Render mechanism: Phase 2 of the roadmap.)*
+- **Runtime-critical conventions** (needed inline for a skill to work) are authored once under `fragments/` and **rendered** into each `SKILL.md` as a generated managed block. Do **not** replace the inline copy with a link — that would break delivery.
 - **Deeper / optional knowledge** may live here as a **loadable reference** — `get_skill` can load a file by path (as `dashboards` already does for `references/how-to-generate-interesting-dashboards.md`).
 
 Do **not** "DRY up" the skills by deleting their inline conventions and pointing at this directory. Self-containment is a delivery contract, not an oversight.
+
+## Render mechanism (live)
+
+A fragment in `fragments/<id>.md` is the single source of a snippet that must appear
+inline in one or more skills. A consuming skill marks where it goes with:
+
+```
+<!-- BEGIN foundation:<id> -->
+...(generated — edit knowledge/fragments/<id>.md, then re-render)...
+<!-- END foundation:<id> -->
+```
+
+- Regenerate all blocks: `scripts/render-foundation.py`
+- CI check (fails on drift): `scripts/render-foundation.py --check` (wired into `.github/workflows/lint.yml`)
+
+Same managed-block pattern the Beads integration already uses in `AGENTS.md`. Editing a
+skill body that contains a managed block still requires the lockstep version bump (see `AGENTS.md`).
+
+**Adopted so far:** `cel-null` (in `recipes/namespace-cost.md`, `recipes/untagged-coverage.md`). Migrating the remaining conventions is tracked in beads (Phase 2).
 
 ## Layout (target — built incrementally)
 

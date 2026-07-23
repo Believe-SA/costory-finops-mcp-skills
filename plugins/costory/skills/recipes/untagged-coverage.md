@@ -142,7 +142,9 @@ Frozen: metric is formula `a / b` (not raw `cost`); `groupBy` = `cos_service_nam
 
 - Measure a **ratio**, not "we spent $2M".
 - Don't include structurally un-taggable spend in the denominator without calling it out — it permanently caps the ratio.
-- Null labels: CEL `== null` / `!= null`, never `is_null` or `"null"`.
+<!-- BEGIN foundation:cel-null -->
+- Null labels are CEL `null` — use `== null` / `!= null`, never `is_null` or the string `"null"`.
+<!-- END foundation:cel-null -->
 
 **Brief:** *"Coverage = [tag field] present / in-scope cost (excl. […]), by service: trend + top/flop, [cadence] to [channel] — formula validated in query first."*
 
