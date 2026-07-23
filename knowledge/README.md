@@ -46,4 +46,7 @@ knowledge/
 └── examples/              # shared skeletons, CEL constants, good/bad/edge cases
 ```
 
-Present today: `customer-foundation/entities.md`, `customer-foundation/metrics.md`.
+Present today:
+
+- `customer-foundation/` — `entities.md` (incl. proposed models for the absent Recommendation / Forecast / typed-Event entities), `metrics.md`, `glossary.md`, `business-rules.md`, `finops-taxonomy.md`
+- `fragments/` — `cel-null.md` (rendered into skills; see below)
