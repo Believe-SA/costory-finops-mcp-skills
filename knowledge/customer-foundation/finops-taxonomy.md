@@ -30,6 +30,9 @@ The capability model the Costory skills are organized against, and the map of wh
 | `recommendations` | Recommendations | Cost Optimization |
 | `alerts` | Automation | Governance |
 | `playbooks` | *(meta)* multi-step orchestration | all |
+| `forecast` | Forecasting | Budget Management |
+| `governance` | Governance | Cost Allocation, Budget Management |
+| `optimization` | Cost Optimization | Recommendations |
 
 ## Coverage heatmap
 
@@ -40,10 +43,10 @@ The capability model the Costory skills are organized against, and the map of wh
 | Reporting | ✅ strong | `reports`, `dashboards`, report recipes |
 | Budget Management | 🟡 partial | `query` F + `budget-vs-actual-dashboard`; no budget *governance* skill |
 | Unit Economics | 🟡 partial | `query` E + `reallocate-by-external-metric`; no dedicated skill |
-| Forecasting | ❌ missing | no forecast tool in the MCP surface — verify product support (Phase 5) |
-| Cost Optimization | 🟡 partial | `recommendations` derives optimization actions from `query` H/G; no dedicated optimization-*actions* skill yet |
+| Forecasting | 🟡 partial | `forecast` skill = run-rate / budget-pace from `query` + `alerts`; statistical forecast is **in-product only** (Forecasting with TimesFM), not on the MCP surface |
+| Cost Optimization | ✅ strong | `optimization` (per-lever sizing method) + `recommendations` (ranked plan); analysis only — the action is the owner's |
 | Recommendations | 🟡 partial | `recommendations` skill (analyst-derived from the data); no vendor recommendation engine in the MCP surface |
-| Governance | 🟡 weak | `untagged-coverage` + VDIM tagging + `alerts` policy + confirm-gates; no dedicated governance skill (Phase 5) |
+| Governance | 🟡 partial | `governance` skill sets coverage/budget/commitment SLOs and monitors adherence (composes `untagged-coverage`, VDIM leftover, `query` H, `alerts`, `reports`); adherence is advisory, not enforced |
 | Automation | ✅ strong | `alerts` (create/preview/list) + `events` (correlate) skills now own the tools; `ec2-cost-spike-alert` recipe |
 
 **Rule of thumb:** every ❌/🟡 that is *not* blocked on the product is already backed by an existing MCP tool — those are buildable now (see the roadmap in [`../../docs/finops-kb-review.md`](../../docs/finops-kb-review.md) §6).

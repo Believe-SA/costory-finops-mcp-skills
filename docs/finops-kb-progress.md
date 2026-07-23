@@ -42,7 +42,11 @@ Status by task:
 | `…-aj9.4` playbooks tier + card contract | **done** (Phase 4 commit — `playbooks/SKILL.md`) |
 | `…-aj9.5` expressible-today playbooks | **done** (monthly-close, allocation-campaign, unit-economics-rollout) |
 | `…-aj9.6` spend-spike-triage playbook (flagship) | **done** (Phase 4 commit) |
-| Phase 5 tasks (forecast/governance/optimization skills) | open (not started) |
+| `…-8le.1` forecast skill | **done** (Phase 5 commit — run-rate; statistical forecast is in-product only) |
+| `…-8le.2` governance skill | **done** (Phase 5 commit) |
+| `…-8le.3` optimization skill | **done** (Phase 5 commit) |
+
+**Roadmap complete — all 5 phases implemented.** There is no Phase 6 in the review (`docs/finops-kb-review.md`); Phase 5 (AI-native) is the final phase. Remaining open items are the deferred `…-dzl.4` (index.json category eval) and the bulk of `…-3g0.1`/`…-3g0.4` (migrate the other ~13 conventions to rendered blocks — the mechanism is done, the migration is mechanical follow-on).
 
 ### Replay once beads is writable
 
@@ -56,6 +60,11 @@ bd close costory-finops-mcp-skills-zzi.1 costory-finops-mcp-skills-zzi.2 costory
 bd close costory-finops-mcp-skills-aj9.1 costory-finops-mcp-skills-aj9.2 costory-finops-mcp-skills-aj9.3 \
         costory-finops-mcp-skills-aj9.4 costory-finops-mcp-skills-aj9.5 costory-finops-mcp-skills-aj9.6 \
   --reason="events/recommendations/alerts skills + playbooks tier + 4 playbook cards (Phase 4 commit, v0.9.0)"
+bd close costory-finops-mcp-skills-8le.1 costory-finops-mcp-skills-8le.2 costory-finops-mcp-skills-8le.3 \
+  --reason="forecast (run-rate)/governance/optimization skills (Phase 5 commit, v0.10.0)"
+# also close the phase epics now their children are done:
+bd close costory-finops-mcp-skills-dzl costory-finops-mcp-skills-zzi costory-finops-mcp-skills-aj9 costory-finops-mcp-skills-8le \
+  --reason="phase complete"   # leave 3g0 (Phase 2) open — migration is ongoing follow-on
 # dependency edges that failed to write:
 bd dep add costory-finops-mcp-skills-aj9.6 costory-finops-mcp-skills-aj9.1   # spend-spike <- events
 bd dep add costory-finops-mcp-skills-aj9.6 costory-finops-mcp-skills-aj9.2   # spend-spike <- recommendations

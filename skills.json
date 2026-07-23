@@ -1,5 +1,5 @@
 {
-  "version": "0.9.0",
+  "version": "0.10.0",
   "skills": {
     "recipes": {
       "id": "recipes",
@@ -54,6 +54,24 @@
       "name": "playbooks",
       "path": "plugins/costory/skills/playbooks/SKILL.md",
       "description": "Multi-step orchestration across skills/recipes with confirm-gates: spend-spike-triage, monthly-close, allocation-campaign, unit-economics-rollout. For a single-skill outcome use recipes instead."
+    },
+    "forecast": {
+      "id": "forecast",
+      "name": "forecast",
+      "path": "plugins/costory/skills/forecast/SKILL.md",
+      "description": "Run-rate / budget-pace projection from query actuals (are we on pace to overspend?) and regression detection via alerts. The MCP has no statistical forecast tool — for that, point to Costory's in-product Forecasting with TimesFM. Never fabricate a projected number."
+    },
+    "governance": {
+      "id": "governance",
+      "name": "governance",
+      "path": "plugins/costory/skills/governance/SKILL.md",
+      "description": "FinOps policy adherence: allocation-coverage SLOs, budget/commitment coverage, tagging and anomaly policy. Composes untagged-coverage, virtual-dimensions leftover, query H, alerts, reports. Targets are the org's to set — never invent an SLO."
+    },
+    "optimization": {
+      "id": "optimization",
+      "name": "optimization",
+      "path": "plugins/costory/skills/optimization/SKILL.md",
+      "description": "The analytical method to find and size a cost-reduction lever — rightsizing/idle, commitment coverage, K8s waste — sized from observed query figures. Companion to recommendations (which ranks and presents the plan)."
     }
   }
 }
