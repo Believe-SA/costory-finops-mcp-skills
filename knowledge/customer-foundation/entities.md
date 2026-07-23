@@ -48,3 +48,48 @@ The three ❌/⚠️ rows are exactly the entities whose absence blocks the miss
 - A **VirtualDimension** re-projects those raw dimensions onto a business axis via ordered CEL rules (first match wins; leftover catches the rest).
 - A **Budget** is compared against actual cost over a period; **utilization** = `cost / budget`.
 - An **Event** is time-anchored and correlated against a cost delta over the same range (`list_events`).
+
+## Proposed entity models (absent today)
+
+The three gaps above, modeled concretely. Each is the entity a currently-missing skill needs. Modeling them here is the Customer Foundation half of unblocking those skills (the other half is the skill itself — see the roadmap, Phase 4/5).
+
+### Recommendation
+
+A concrete, prioritized action to reduce or reallocate spend, with estimated impact.
+
+| Attribute | Value / source |
+|-----------|----------------|
+| Backing tool | `suggest_actions` (today only a "next steps" hint; no first-class object) |
+| Proposed fields | `id`, `type` (rightsizing \| commitment \| waste \| tagging \| anomaly-followup), `target` (resource/service/scope CEL), `estimatedSavings` (money + currency + period), `confidence`, `effort`, `rationale`, `status` (open \| accepted \| dismissed \| done) |
+| Key metric | `estimatedSavings` — grounded in `effective_cost` / `contracted_cost` and usage (see [`metrics.md`](./metrics.md)) |
+| Unblocks | `recommendations` skill: RecommendSavingsPlan, RecommendRightsizing, PrioritizeRecommendations, ExplainRecommendation, EstimateSavings |
+| Relationships | targets a Resource/Service/Scope; may cite a Commitment; feeds the *Recommendations* and *Cost Optimization* capabilities |
+
+### Forecast
+
+A projection of future spend for a scope over a horizon, with a confidence band.
+
+| Attribute | Value / source |
+|-----------|----------------|
+| Backing tool | **none in the current MCP surface** — confirm the Costory backend exposes forecasting before designing the skill |
+| Proposed fields | `scope` (CEL / VDIM / whole-org), `horizon` (period), `method` (trend \| seasonal \| driver-based), `points[]` (date → projected cost), `low`/`high` band, `basisPeriod`, `assumptions` |
+| Key metric | projected `cost` (or `effective_cost`); compared against a Budget for pace |
+| Unblocks | `forecast` skill: ForecastSpend, DetectCostRegression |
+| Relationships | consumes historical cost + Events (deploys shift the baseline); pairs with Budget for "on pace?"; feeds *Forecasting* and *Budget Management* |
+| Status | **product-blocked** — flag as a gap if no backend forecast API exists; do not fabricate forecast behavior |
+
+### Event — typed (Deployment / Incident)
+
+Costory already has a generic, **untyped** `Event` (`create_event` / `update_event` / `list_events`). Costory's stated pillar is *correlating costs with engineering events* — which wants **typed** events so correlation can be automatic and meaningful.
+
+| Attribute | Value / source |
+|-----------|----------------|
+| Backing tool | `create_event` / `update_event` / `list_events` (present; type is currently free-form) |
+| Proposed types | `deployment`, `incident`, `config-change`, `scaling-event`, `feature-launch` |
+| Proposed fields | `id`, `type`, `timestamp` (+ optional end), `scope` (service/team/env CEL), `source` (CI/CD, incident tool), `ref` (commit/PR/incident id), `description` |
+| Correlation | join to a cost delta over the same range + scope (`query` / DIGEST); a deploy or incident that lines up with a spike is a candidate driver |
+| Unblocks | `events` skill: AnalyzeDeploymentImpact, CorrelateDeployments, CorrelateIncidents — and the flagship **spend-spike-triage** playbook |
+| Relationships | anchors to a Service/Team/Environment; is the correlation counterpart to a cost mover; feeds *Cost Intelligence* and *Automation* |
+
+**Integration note.** Typed events are the highest-leverage of the three: the tools already exist, and they unblock both the `events` skill and the canonical playbook. Forecasting is the one to verify against the product first.
+

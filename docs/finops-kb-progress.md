@@ -32,7 +32,11 @@ Status by task:
 | `…-3g0.2` render mechanism | **done** (`scripts/render-foundation.py`) |
 | `…-3g0.3` drift-lint CI | **done** (lint.yml step) |
 | `…-3g0.4` migrate skills to render-from-source | **in progress** — recipes `namespace-cost`, `untagged-coverage` migrated for `cel-null` |
-| Phase 3/4/5 tasks | open (not started) |
+| `…-zzi.1` glossary.md | **done** (Phase 3 commit) |
+| `…-zzi.2` business-rules.md | **done** (Phase 3 commit) |
+| `…-zzi.3` finops-taxonomy.md | **done** (Phase 3 commit) |
+| `…-zzi.4` model absent entities (Recommendation/Forecast/typed Event) | **done** (Phase 3 commit — in `entities.md`) |
+| Phase 4/5 tasks | open (not started) |
 
 ### Replay once beads is writable
 
@@ -41,6 +45,8 @@ bd close costory-finops-mcp-skills-dzl.1 costory-finops-mcp-skills-dzl.2 costory
   --reason="Implemented in 7e3e798"
 bd close costory-finops-mcp-skills-3g0.2 costory-finops-mcp-skills-3g0.3 \
   --reason="render-foundation.py + drift-lint CI (Phase 2 commit)"
+bd close costory-finops-mcp-skills-zzi.1 costory-finops-mcp-skills-zzi.2 costory-finops-mcp-skills-zzi.3 costory-finops-mcp-skills-zzi.4 \
+  --reason="Customer Foundation docs (Phase 3 commit)"
 # dependency edges that failed to write:
 bd dep add costory-finops-mcp-skills-aj9.6 costory-finops-mcp-skills-aj9.1   # spend-spike <- events
 bd dep add costory-finops-mcp-skills-aj9.6 costory-finops-mcp-skills-aj9.2   # spend-spike <- recommendations
