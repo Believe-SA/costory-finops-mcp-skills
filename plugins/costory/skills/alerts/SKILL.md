@@ -50,6 +50,12 @@ Window math is evaluated **daily in BigQuery** — you do **not** pick an evalua
 | WoW spike >10% (7-day sum vs prior 7-day sum) | `rollingSum(a, 7, DAY) > timeShift(rollingSum(a, 7, DAY), 7, DAY) * 1.1` |
 | Day-over-day jump >20% | `(a - timeShift(a, 1, DAY)) / timeShift(a, 1, DAY) > 0.2` |
 | Today above the trailing 7-day average +10% | `a > (rollingSum(a, 7, DAY) / 7) * 1.1` |
+| On pace to overspend the monthly budget (MTD cost past prorated budget) | `monthToDateSum(a) > monthToDateSum(b)` (`a` = cost leg, `b` = budget leg) |
+
+### Destinations & scope
+
+- **Slack DM:** `slackChannelId` takes a channel id (`C…`) to post to a channel **or** a Slack user id (`U…`) to deliver a direct message to that user — `list_available_destinations` returns both the channels and the signed-in user's DM target.
+- **Team-scoped monitor:** pass `scopeId` (a saved team scope id from `list_teams`) to merge that team's `whereClause` into the cost/usage queries — the same scoping as a team dashboard, without hand-writing the CEL.
 
 ## Tool order
 
@@ -96,7 +102,51 @@ Window math is evaluated **daily in BigQuery** — you do **not** pick an evalua
 
 For the concrete EC2 card (frozen defaults + confirm gates), load `recipes` → `ec2-cost-spike-alert`.
 
-## Workflow B — Review existing alerts
+## Workflow B — Create a budget-pace alert
+
+Fires when month-to-date spend runs ahead of the budget's prorated pace — pair a `cost` leg with a `budget` leg in the same `queries` array.
+
+1. `get_context`
+2. Resolve the budget: `search` `type: ["budgets"]` → parent budget `id` → `get` that id → read `budgetVersionId` (align the cost leg's `metricId` / `currency` with the budget's `costMetricId` / `currency` when `get` returns them). This is **query Workflow F**.
+3. `preview_alert` with both legs + condition → present `firingDays` / `notificationsCount`; tune tolerance/dedup and re-preview
+4. Resolve the destination (`list_available_destinations` for the chosen channel type)
+5. **Explicit confirm** → `create_alert` with the same queries + condition → include the returned URL
+
+The budget leg's daily value is the prorated budget, so `monthToDateSum(b)` is the running budget pace and `monthToDateSum(a)` the running actual — the condition fires the day actuals cross the line. Add a tolerance (e.g. `* 1.05`) to avoid firing on a marginal overshoot.
+
+**Example — preview a budget-pace alert (backtest 90 days):**
+
+```json
+{
+  "queries": [
+    { "type": "cost", "name": "a", "metricId": "cost", "currency": "USD", "filterCel": "cos_provider in [\"AWS\"]" },
+    { "type": "budget", "name": "b", "budgetId": "<budgetVersionId>" }
+  ],
+  "condition": "monthToDateSum(a) > monthToDateSum(b) * 1.05",
+  "dedup": { "kind": "CALENDAR", "calendarUnit": "MONTH" },
+  "lookbackDays": 90
+}
+```
+
+**Then create (adds channel + name; same queries/condition/dedup):**
+
+```json
+{
+  "name": "AWS on pace to overspend monthly budget",
+  "queries": [
+    { "type": "cost", "name": "a", "alias": "AWS cost", "metricId": "cost", "currency": "USD", "filterCel": "cos_provider in [\"AWS\"]" },
+    { "type": "budget", "name": "b", "alias": "AWS budget", "budgetId": "<budgetVersionId>" }
+  ],
+  "datePreset": "MTD",
+  "aggBy": "Day",
+  "condition": "monthToDateSum(a) > monthToDateSum(b) * 1.05",
+  "dedup": { "kind": "CALENDAR", "calendarUnit": "MONTH" },
+  "notificationChannel": "SLACK",
+  "slackChannelId": "C…"
+}
+```
+
+## Workflow C — Review existing alerts
 
 `list_alerts` (`type: "cost" | "budget" | "all"`) — **only** when the user explicitly asks what monitors exist. Returns each alert's `condition` + `dedup` (legacy alerts return structured `thresholds`).
 

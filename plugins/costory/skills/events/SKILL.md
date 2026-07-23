@@ -27,6 +27,7 @@ An event has: `name` (≥5 chars), `date`, `description`, a `category` (`TECHNIC
 2. `get_context` — org context, currency
 3. `list_tags` — before attaching tags, to reuse existing label values (do not invent)
 4. `list_events` (correlate) / `create_event` / `update_event`
+5. `delete_tag` (cleanup) — retire an obsolete/duplicate tag value once `list_tags` shows it at **0 uses**; confirm with the user first
 
 ## Concepts
 
@@ -34,7 +35,7 @@ An event has: `name` (≥5 chars), `date`, `description`, a `category` (`TECHNIC
 |---------|---------|
 | Category | `TECHNICAL` = deploy/infra change · `BUSINESS` = org/budget/pricing decision · `PROVIDER` = cloud-provider update |
 | Widget annotation | Same shape as a `query` (`queries`, `datePreset` or `from`/`to`, `aggBy`, …) + `title`. Pins the event to a specific cost chart. **Strongly recommended**; omit only for a purely org-wide event with no chart |
-| Tags | String labels (`"migration"`, `"scaling"`). Discover existing values with `list_tags` first — do not invent parallel labels |
+| Tags | String labels (`"migration"`, `"scaling"`). Discover existing values with `list_tags` first — do not invent parallel labels. Write-side complement: retire an obsolete/duplicate value with `delete_tag` (only once `list_tags` reports **0 uses** — re-point resources to the canonical value first) |
 | Metadata | Key-value pairs (`link`, `owner`, external ref). `metadata.source` is reserved/system-managed — never set it |
 | Correlation | An event that lines up in time + scope with a cost mover is a **candidate driver** — surface it as such, do not assert causation |
 
@@ -99,6 +100,7 @@ Use after a `query` / DIGEST shows a cost movement on a date, or when the user a
 - Do not assert **causation** from correlation — an aligned event is a *candidate* driver; the drivers decomposition is DIGEST's job
 - Do not omit the `widget` on a cost-specific event — the annotation is the point (omit only for truly org-wide events)
 - Do not invent tag values — `list_tags` first and reuse
+- Do not `delete_tag` without confirming with the user and checking `list_tags` for **0 uses** — it removes the label org-wide and fails on a tag still in use; re-point resources onto the canonical value before deleting a duplicate (same mutation-confirm gate as `create_event`)
 - Do not set `metadata.source` — it is reserved
 - Do not use a `name` shorter than 5 characters
 - Do not use this skill to *explain* a delta's internal composition — hand off to `reports` Explain / `explain-period-change`

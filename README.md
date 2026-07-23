@@ -31,6 +31,8 @@ plugins/costory/
 | `forecast` | Run-rate / budget-pace projection; points to in-product statistical forecast |
 | `governance` | FinOps policy & SLO adherence (coverage, budget, commitment, tagging) |
 | `optimization` | Method to find + size a saving lever (rightsizing, commitments, waste) |
+| `unit-economics` | Cost-per-unit (per request/GB/delivery/customer/token) |
+| `docs` | Costory product documentation lookup + in-product feature pointers |
 
 ## Install (Claude Code / Codex)
 

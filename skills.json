@@ -1,5 +1,5 @@
 {
-  "version": "0.10.1",
+  "version": "0.11.0",
   "skills": {
     "recipes": {
       "id": "recipes",
@@ -72,6 +72,18 @@
       "name": "optimization",
       "path": "plugins/costory/skills/optimization/SKILL.md",
       "description": "The analytical method to find and size a cost-reduction lever — rightsizing/idle, commitment coverage, K8s waste — sized from observed query figures. Companion to recommendations (which ranks and presents the plan)."
+    },
+    "unit-economics": {
+      "id": "unit-economics",
+      "name": "unit-economics",
+      "path": "plugins/costory/skills/unit-economics/SKILL.md",
+      "description": "Cost-per-unit — cost per request, per GB, per delivery, per customer, per token. Cost leg + usage/metric leg + formula a/b, grounded in query Workflow E. Decides KPI-only ratio vs reallocating shared spend (→ reallocate-by-external-metric / virtual-dimensions telemetry)."
+    },
+    "docs": {
+      "id": "docs",
+      "name": "docs",
+      "path": "plugins/costory/skills/docs/SKILL.md",
+      "description": "Look up Costory product how-to/what-is documentation (search_documentation → get_documentation_page) and point to in-product features the MCP has no tool for (e.g. statistical Forecasting with TimesFM). Never fabricate a doc path or feature."
     }
   }
 }

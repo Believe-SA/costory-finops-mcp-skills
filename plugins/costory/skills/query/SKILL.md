@@ -35,6 +35,8 @@ description: "Use when exploring Costory cost, usage, metric, formula, budget, o
 
 Never put the split dimension into `filterCel` (or the filter into `groupBy`). Discover exact CEL names with `search` (`type: ["dimensions"]`) — Costory labels use a `cos_` prefix (e.g. `cos_service_name`).
 
+**Saved team scope:** to apply a team's pre-defined scope, pass `scopeId` (from `list_teams`) on `query` — it merges that team's `whereClause` into cost/usage series. Equivalent to using the team's `filterCel` inline.
+
 ### Query naming
 
 - `name` — single lowercase letter (`a`–`z`) for formula references
@@ -64,7 +66,7 @@ Provide a period with **either** `datePreset` **or** `from` + `to` (ISO dates, i
 | `Period` | Single-bucket total or composition for the whole range (good with `groupBy`) |
 | `Hour` | Rare; fine-grained short windows |
 
-**Time series vs comparison:** omit `compare` for evolution within one range. For period-over-period deltas, pass `compare` — prefer `datePreset` on the primary period + `compare: {}` (or `{ enabled: true }`) so the server auto-derives the **preceding period** (preset-aware, e.g. `LAST_MONTH` → previous calendar month). Pass `compare: { from, to }` only for a custom other range. Optional `compare.chartType`: `WATERFALL` (default), `TABLE`, or `KPI_BREAKDOWN`.
+**Time series vs comparison:** omit `compare` for evolution within one range. For period-over-period deltas, pass `compare` — prefer `datePreset` on the primary period + `compare: {}` (or `{ enabled: true }`) so the server auto-derives the **preceding period** (preset-aware, e.g. `LAST_MONTH` → previous calendar month). Pass `compare: { from, to }` only for a custom other range. Optional `compare.chartType`: `WATERFALL` (default, contribution-to-change bridge), `TABLE` (before/after rows), or `KPI_BREAKDOWN` — per-group before/after KPI cards; reach for it when the query has a `groupBy` and the user wants each group's old-vs-new value side by side rather than a bridge. `KPI_BREAKDOWN` and `TABLE` widgets cannot be exported as PNG.
 
 ### Limit
 

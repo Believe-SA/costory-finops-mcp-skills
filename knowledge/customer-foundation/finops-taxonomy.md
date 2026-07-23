@@ -33,6 +33,8 @@ The capability model the Costory skills are organized against, and the map of wh
 | `forecast` | Forecasting | Budget Management |
 | `governance` | Governance | Cost Allocation, Budget Management |
 | `optimization` | Cost Optimization | Recommendations |
+| `unit-economics` | Unit Economics | Cost Allocation |
+| `docs` | *(meta)* documentation lookup | — |
 
 ## Coverage heatmap
 
@@ -42,7 +44,7 @@ The capability model the Costory skills are organized against, and the map of wh
 | Cost Allocation | ✅ strong | `virtual-dimensions`, `namespace-cost`, `reallocate-by-external-metric` |
 | Reporting | ✅ strong | `reports`, `dashboards`, report recipes |
 | Budget Management | 🟡 partial | `query` F + `budget-vs-actual-dashboard`; no budget *governance* skill |
-| Unit Economics | 🟡 partial | `query` E + `reallocate-by-external-metric`; no dedicated skill |
+| Unit Economics | ✅ strong | `unit-economics` skill (cost-per-unit + KPI-vs-reallocate decision) + `query` E + `reallocate-by-external-metric` |
 | Forecasting | 🟡 partial | `forecast` skill = run-rate / budget-pace from `query` + `alerts`; statistical forecast is **in-product only** (Forecasting with TimesFM), not on the MCP surface |
 | Cost Optimization | ✅ strong | `optimization` (per-lever sizing method) + `recommendations` (ranked plan); analysis only — the action is the owner's |
 | Recommendations | 🟡 partial | `recommendations` skill (analyst-derived from the data); no vendor recommendation engine in the MCP surface |
