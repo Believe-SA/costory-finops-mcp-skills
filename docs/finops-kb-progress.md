@@ -1,20 +1,29 @@
 # FinOps KB transformation — progress & handoff
 
-Resume-state for the knowledge-base roadmap in [`finops-kb-review.md`](./finops-kb-review.md).
+Resume-state for the knowledge-base roadmap in [`finops-kb-review.md`](./finops-kb-review.md), the review/fix pass in [`finops-kb-review-issues.md`](./finops-kb-review-issues.md), and the backlog implementation round.
 
-> **Beads note.** The beads Dolt store was **read-only** for the whole implementation session
-> (write lock held by another checkout/session), so completed tasks could not be closed and
-> dependency edges could not be written. The roadmap issues themselves *do* exist. Replay the
-> writes below once the lock clears.
+> **Beads note.** The beads Dolt write lock has been **intermittent** all session (read-only most
+> of the time, briefly writable once — long enough to file the 22 review issues, but it closed
+> again before the phase-completion closes/deps or the backlog closes could land). All work is
+> committed to git regardless; only the beads bookkeeping (close + dep edges) is queued.
+>
+> **Single consolidated replay script** (supersedes the smaller command blocks below —
+> run this one, once, when the lock is free):
+> `/home/chussenot/.claude/jobs/0b97e987/tmp/bd-replay-all.sh`
 
-## Branch / git state
+## Branch / git state (PR opened)
 
-- Branch: `worktree-finops-kb-review` (worktree). **Not pushed** — an earlier `git push` was declined.
-- Commits (on top of `main`):
-  - `49152de` docs: FinOps KB review (`docs/finops-kb-review.md`)
+- Branch: `worktree-finops-kb-review`, pushed to `origin` (the `Believe-SA` fork). A draft PR was intended via `gh pr create --repo Believe-SA/costory-finops-mcp-skills --base main --head worktree-finops-kb-review` — it failed once with `must be a collaborator` (gh token identity vs the SSH key used to push are different accounts); resolve via `gh auth status` / `gh auth switch` / `gh auth refresh -s repo`, or open the compare URL directly: `https://github.com/Believe-SA/costory-finops-mcp-skills/compare/main...worktree-finops-kb-review?expand=1`.
+- Commits (on top of `main`), newest first:
+  - `ea97ab2` Backlog implementation — unit-economics + docs skills, anomaly-triage playbook, 9 skill enhancements (v0.11.0, **14 skills**)
+  - `3e8f6cf` Review fixes — 17 confirmed findings resolved + 22 issues filed in beads (v0.10.1)
+  - `fa08741` Phase 5 — forecast, governance, optimization (v0.10.0)
+  - `a7608a1` Phase 4 — events, recommendations, alerts, playbooks tier (v0.9.0)
+  - `2a67769` Phase 3 — Customer Foundation complete
+  - `5a6b0cb` Phase 2 — render mechanism + cel-null single-sourced (v0.8.4)
   - `7e3e798` Phase 1 — DatePreset drift lint + Customer Foundation seed
-  - Phase 2 commit (this change) — render mechanism + `cel-null` migration + v0.8.4
-- To ship: `git push -u origin worktree-finops-kb-review` then `gh pr create --draft`.
+  - `49152de` docs: FinOps KB review (`docs/finops-kb-review.md`)
+- **Pushed.** Remaining to ship: open the PR (see above — blocked on `gh` auth, not on the code).
 
 ## Beads issues (roadmap)
 
