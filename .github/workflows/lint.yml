@@ -104,6 +104,30 @@ jobs:
             }
           done
 
+      - name: DatePreset tokens stay within query's authoritative enum
+        run: |
+          set -e
+          # The 16-value DatePreset enum is a server contract; the server rejects any
+          # other token with `-32602 Invalid option ... path: ["datePreset"]`.
+          # query/SKILL.md is the authoritative source AND the only file allowed to
+          # name invalid tokens (it lists counter-examples, e.g. "there is no
+          # LAST_2_MONTHS, TRAILING_60_DAYS"). Every other skill/recipe must use only
+          # valid tokens. Only the compound LAST_*/TRAILING_* forms are scanned —
+          # those are the ones a model might invent a variant of (LAST_2_MONTHS);
+          # MTD/QTD/YTD are atomic and carry no drift risk.
+          canon=" TRAILING_3_DAYS TRAILING_7_DAYS TRAILING_30_DAYS TRAILING_45_DAYS TRAILING_90_DAYS TRAILING_14_WEEKS LAST_WEEK LAST_MONTH LAST_3_MONTHS LAST_6_MONTHS LAST_12_MONTHS LAST_4_YEARS LAST_INVOICE_MONTH MTD QTD YTD "
+          violations=$(mktemp)
+          for f in $(find plugins/costory/skills -name '*.md'); do
+            [ "$f" = "plugins/costory/skills/query/SKILL.md" ] && continue
+            for t in $(grep -hoE '\b(TRAILING|LAST)_[A-Z0-9_]+\b' "$f" | sort -u); do
+              case "$canon" in
+                *" $t "*) ;;
+                *) echo "::error file=$f::'$t' is not in the DatePreset enum (16 values in query/SKILL.md); the server rejects unknown tokens with -32602 — use a valid preset or explicit from/to" >> "$violations" ;;
+              esac
+            done
+          done
+          if [ -s "$violations" ]; then cat "$violations"; exit 1; fi
+
       - name: SKILL.md descriptions must be <= 1024 chars (Codex drops longer ones)
         run: |
           set -e
