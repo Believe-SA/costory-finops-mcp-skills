@@ -5,8 +5,8 @@
     "email": "support@costory.io"
   },
   "metadata": {
-    "description": "Costory FinOps skills for AI agents: query, virtual dimensions, dashboards, reports (DIGEST) workflows, and ready-made tracking recipes for the Costory MCP tool surface.",
-    "version": "0.10.0"
+    "description": "Costory FinOps skills for AI agents: query, virtual dimensions, dashboards, reports (DIGEST), recipes, plus events, alerts, recommendations, forecast, governance, optimization, and multi-step playbooks — over the Costory MCP tool surface.",
+    "version": "0.10.1"
   },
   "plugins": [
     {

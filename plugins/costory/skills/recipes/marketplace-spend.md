@@ -50,7 +50,7 @@
     }
   ],
   "destinations": [{
-    "destinationType": "[SLACK|TEAMS|EMAIL]",
+    "destinationType": "[SLACK|TEAMS]",
     "channelId": "[DESTINATION_ID]"
   }]
 }

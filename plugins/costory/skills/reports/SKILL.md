@@ -272,7 +272,7 @@ DIGEST builds a tree. Levels map to fields:
 | User says | `context.groupBy` (root) | `additionalGroupBy` |
 |-----------|---------------------------|---------------------|
 | provider → service | `cos_provider` | `["cos_service_name"]` |
-| env → project → service | `environment` | `["cos_sub_account_id", "cos_service_name"]` |
+| env → project → service | `cos_environment` | `["cos_sub_account_id", "cos_service_name"]` |
 | team → service | `team` | `["cos_service_name"]` |
 
 - Confirm the resolved path with the user when they describe a hierarchy in plain language (e.g. "production → Costory → AmazonEC2").
@@ -311,7 +311,7 @@ Tune from `recommendations`: thresholds, `topLargestAbsoluteChange` (only 5, 10,
 {
   "context": {
     "datePreset": "LAST_MONTH",
-    "groupBy": "environment",
+    "groupBy": "cos_environment",
     "metricId": "cost",
     "currency": "USD"
   },
@@ -415,7 +415,7 @@ Tune from `recommendations`: thresholds, `topLargestAbsoluteChange` (only 5, 10,
   },
   "context": {
     "datePreset": "LAST_MONTH",
-    "groupBy": "environment",
+    "groupBy": "cos_environment",
     "metricId": "cost",
     "currency": "USD"
   },
@@ -423,6 +423,8 @@ Tune from `recommendations`: thresholds, `topLargestAbsoluteChange` (only 5, 10,
   "destinations": [{ "destinationType": "SLACK", "channelId": "C…" }]
 }
 ```
+
+**Destination shapes** (resolve via `list_available_destinations`): `SLACK` and `TEAMS` use `{ "destinationType": …, "channelId": … }` — a Slack `channelId` is a `C…` channel or a `U…` DM. **`EMAIL` uses a different key:** `{ "destinationType": "EMAIL", "email": "<address>" }` (or `"ALL_ACTIVE_USERS"` to fan out) — never `channelId`.
 
 ## Payload anti-patterns
 

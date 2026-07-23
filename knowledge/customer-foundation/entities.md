@@ -35,12 +35,12 @@ The canonical business-entity model the Costory skills operate on. Today this mo
 | Entity | Current representation | Gap |
 |--------|------------------------|-----|
 | Commitment / SavingsPlan / CUD | *implicit* — surfaces as `contracted_cost` − `effective_cost` ("effective savings") | Model as a **derived metric** (see `metrics.md`), not a raw entity. |
-| Recommendation | *implicit* — `suggest_actions` tool output only | ❌ **Not modeled.** Blocks a first-class `recommendations` skill. |
-| Forecast | none — no forecast tool in the MCP surface | ❌ **Not modeled.** Confirm backend support before designing a `forecast` skill. |
-| Event (Deployment / Incident) | generic `Event` (`create_event` / `list_events`) — untyped | ⚠️ Present but **untyped**. Costory's "correlate cost with engineering events" pillar wants typed Deployment/Incident events. |
+| Recommendation | *implicit* — `suggest_actions` tool output only | ⚠️ Not a first-class Foundation entity — surfaced via `suggest_actions` + analyst-derived `query`; the `recommendations` skill already consumes it. |
+| Forecast | none — no forecast tool in the MCP surface | ⚠️ Not modeled as an MCP entity/tool; the `forecast` skill does run-rate projection, and statistical forecasting is an in-product feature (Forecasting with TimesFM). |
+| Event (Deployment / Incident) | generic `Event` (`create_event` / `list_events`) — untyped | ⚠️ The `events` skill wraps the generic (untyped) Event; typed Deployment/Incident events remain a modeling gap. |
 | CostCenter / BusinessUnit / Owner | would be **virtual dimensions** | ⚠️ Pattern exists (VDIM), not first-class Foundation entities. |
 
-The three ❌/⚠️ rows are exactly the entities whose absence blocks the missing skills (`recommendations`, `forecast`, `events`) — see the roadmap.
+These entities remain modeling gaps even though the `recommendations`, `forecast`, and `events` skills now exist — each works around the gap as noted. See the roadmap.
 
 ## Relationships (informal)
 
@@ -49,9 +49,9 @@ The three ❌/⚠️ rows are exactly the entities whose absence blocks the miss
 - A **Budget** is compared against actual cost over a period; **utilization** = `cost / budget`.
 - An **Event** is time-anchored and correlated against a cost delta over the same range (`list_events`).
 
-## Proposed entity models (absent today)
+## Proposed entity models
 
-The three gaps above, modeled concretely. Each is the entity a currently-missing skill needs. Modeling them here is the Customer Foundation half of unblocking those skills (the other half is the skill itself — see the roadmap, Phase 4/5).
+The three gaps above, modeled concretely. The skills that use them — `recommendations`, `forecast`, `events` — now exist and work around the missing entity; formalizing each here is the Customer Foundation half that strengthens them (see the roadmap, Phase 4/5).
 
 ### Recommendation
 

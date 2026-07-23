@@ -8,7 +8,7 @@ description: "Use for the ANALYTICAL METHOD behind a specific cost-reduction lev
 The **analytical methods** for finding and sizing cost-reduction opportunities, lever by lever. This is the *how do I actually compute this saving?* companion to `recommendations` (which ranks, presents, and operationalizes the plan). Split of duties:
 
 - **`optimization`** (here) — the method + sizing per lever, from `query` data.
-- **`recommendations`** — prioritize, explain, and operationalize the resulting opportunities.
+- **`recommendations`** — the action-plan entry point; it also sizes opportunities at summary level, then prioritizes, explains, and operationalizes. `optimization` (here) is the deep-dive sizing *method* for one lever.
 - **`governance`** — set the coverage/commitment targets. **`forecast`** — project pace.
 
 Every opportunity is **sized from observed `query` figures**, stated as an estimate with its basis period. Never invent a saving.
@@ -56,7 +56,7 @@ Every opportunity is **sized from observed `query` figures**, stated as an estim
 - Do not size a saving from a single period — require sustained/steady behavior over a trailing window
 - Do not invent a number — every estimate traces to an observed `query` figure; say "estimate" + basis period
 - Do not recommend rightsizing without noting it needs validation, or commitments without the lock-in / break-even caveat
-- Do not duplicate `recommendations` — produce **sized opportunities**; ranking, presentation, and operationalization live there
+- Stay in your lane vs `recommendations`: this skill is the deep-dive **sizing method** for one lever; ranking, presentation, and operationalization live there (`recommendations` also sizes at summary level)
 - Do not treat credit runway as a saving — it is a risk to plan for, not money to cut
 
 ## Related Skills / Next Steps

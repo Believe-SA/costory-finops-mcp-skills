@@ -45,7 +45,8 @@ Use when the user wants to document why cost changed.
 1. `get_context`; `list_tags` if tagging
 2. Draft the event: `name`, `date` (YYYY-MM-DD), `description`, `category`
 3. Build a **widget** scoped to the affected spend (same shape as `query` + `title`) so the annotation is visual
-4. `create_event` — include the returned event in your reply
+4. **Confirm the event with the user** (name, date, scope, tags, whether it annotates a chart) — an event writes to the shared cost timeline the whole org sees
+5. `create_event` — include the returned event in your reply
 
 **Example — log a Kubernetes migration with an annotation chart:**
 
@@ -83,7 +84,7 @@ Use after a `query` / DIGEST shows a cost movement on a date, or when the user a
 
 ## Workflow C — Update an event
 
-`list_events` → find `eventId` → `update_event` with only the fields to change.
+`list_events` → find `eventId` → confirm the change with the user → `update_event` with only the fields to change.
 
 - `tags` **replace** the full label list; `metadata` **merges** (existing `source` preserved)
 - `widget` updates the annotation chart (creates one if none); pass `widgetEventId` when the event has multiple charts
@@ -94,6 +95,7 @@ Use after a `query` / DIGEST shows a cost movement on a date, or when the user a
 
 ## Safety Rules / Anti-patterns
 
+- Do not `create_event` / `update_event` without confirming the details first — an event writes to the shared cost timeline the whole org sees (consistent with the mutation-confirm rule other skills follow)
 - Do not assert **causation** from correlation — an aligned event is a *candidate* driver; the drivers decomposition is DIGEST's job
 - Do not omit the `widget` on a cost-specific event — the annotation is the point (omit only for truly org-wide events)
 - Do not invent tag values — `list_tags` first and reuse
@@ -106,4 +108,4 @@ Use after a `query` / DIGEST shows a cost movement on a date, or when the user a
 - `query` — find the movement and its date range before correlating (`list_events` uses that range)
 - `reports` → `recipes` → `explain-period-change` — decompose *why* the number moved (internal drivers), distinct from external-event correlation
 - `alerts` — turn a recurring spike into a standing notification
-- `recipes` → (playbook) `spend-spike-triage` — the full loop: explain → correlate events → find drivers → estimate savings → summarize
+- `playbooks` → `spend-spike-triage` — the full loop: explain → correlate events → find drivers → estimate savings → summarize
