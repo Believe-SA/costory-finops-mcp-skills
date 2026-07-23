@@ -36,7 +36,13 @@ Status by task:
 | `…-zzi.2` business-rules.md | **done** (Phase 3 commit) |
 | `…-zzi.3` finops-taxonomy.md | **done** (Phase 3 commit) |
 | `…-zzi.4` model absent entities (Recommendation/Forecast/typed Event) | **done** (Phase 3 commit — in `entities.md`) |
-| Phase 4/5 tasks | open (not started) |
+| `…-aj9.1` events skill | **done** (Phase 4 commit) |
+| `…-aj9.2` recommendations skill | **done** (Phase 4 commit — analyst-derived; no vendor engine) |
+| `…-aj9.3` alerts skill | **done** (Phase 4 commit) |
+| `…-aj9.4` playbooks tier + card contract | **done** (Phase 4 commit — `playbooks/SKILL.md`) |
+| `…-aj9.5` expressible-today playbooks | **done** (monthly-close, allocation-campaign, unit-economics-rollout) |
+| `…-aj9.6` spend-spike-triage playbook (flagship) | **done** (Phase 4 commit) |
+| Phase 5 tasks (forecast/governance/optimization skills) | open (not started) |
 
 ### Replay once beads is writable
 
@@ -47,6 +53,9 @@ bd close costory-finops-mcp-skills-3g0.2 costory-finops-mcp-skills-3g0.3 \
   --reason="render-foundation.py + drift-lint CI (Phase 2 commit)"
 bd close costory-finops-mcp-skills-zzi.1 costory-finops-mcp-skills-zzi.2 costory-finops-mcp-skills-zzi.3 costory-finops-mcp-skills-zzi.4 \
   --reason="Customer Foundation docs (Phase 3 commit)"
+bd close costory-finops-mcp-skills-aj9.1 costory-finops-mcp-skills-aj9.2 costory-finops-mcp-skills-aj9.3 \
+        costory-finops-mcp-skills-aj9.4 costory-finops-mcp-skills-aj9.5 costory-finops-mcp-skills-aj9.6 \
+  --reason="events/recommendations/alerts skills + playbooks tier + 4 playbook cards (Phase 4 commit, v0.9.0)"
 # dependency edges that failed to write:
 bd dep add costory-finops-mcp-skills-aj9.6 costory-finops-mcp-skills-aj9.1   # spend-spike <- events
 bd dep add costory-finops-mcp-skills-aj9.6 costory-finops-mcp-skills-aj9.2   # spend-spike <- recommendations

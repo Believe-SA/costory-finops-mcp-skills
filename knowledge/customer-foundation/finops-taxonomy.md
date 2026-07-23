@@ -25,7 +25,11 @@ The capability model the Costory skills are organized against, and the map of wh
 | `dashboards` | Reporting | Cost Intelligence |
 | `reports` | Reporting | Cost Intelligence (DIGEST = explanation) |
 | `virtual-dimensions` | Cost Allocation | Governance (tagging) |
-| `recipes` | *(meta)* Automation / Playbook router | all |
+| `recipes` | *(meta)* single-skill outcome router | all |
+| `events` | Cost Intelligence (event correlation) | Automation |
+| `recommendations` | Recommendations | Cost Optimization |
+| `alerts` | Automation | Governance |
+| `playbooks` | *(meta)* multi-step orchestration | all |
 
 ## Coverage heatmap
 
@@ -36,11 +40,11 @@ The capability model the Costory skills are organized against, and the map of wh
 | Reporting | ✅ strong | `reports`, `dashboards`, report recipes |
 | Budget Management | 🟡 partial | `query` F + `budget-vs-actual-dashboard`; no budget *governance* skill |
 | Unit Economics | 🟡 partial | `query` E + `reallocate-by-external-metric`; no dedicated skill |
-| Forecasting | ❌ missing | no forecast tool in the MCP surface — verify product support |
-| Cost Optimization | ❌ missing | only `query` H (contracted vs effective *analysis*), no *actions* |
-| Recommendations | ❌ missing | `suggest_actions` tool has no owning skill |
-| Governance | 🟡 weak | `untagged-coverage` + VDIM tagging + confirm-gates; no governance skill |
-| Automation | 🟡 partial | `ec2-cost-spike-alert` recipe; `create_alert`/`create_event` tools have no owning skill |
+| Forecasting | ❌ missing | no forecast tool in the MCP surface — verify product support (Phase 5) |
+| Cost Optimization | 🟡 partial | `recommendations` derives optimization actions from `query` H/G; no dedicated optimization-*actions* skill yet |
+| Recommendations | 🟡 partial | `recommendations` skill (analyst-derived from the data); no vendor recommendation engine in the MCP surface |
+| Governance | 🟡 weak | `untagged-coverage` + VDIM tagging + `alerts` policy + confirm-gates; no dedicated governance skill (Phase 5) |
+| Automation | ✅ strong | `alerts` (create/preview/list) + `events` (correlate) skills now own the tools; `ec2-cost-spike-alert` recipe |
 
 **Rule of thumb:** every ❌/🟡 that is *not* blocked on the product is already backed by an existing MCP tool — those are buildable now (see the roadmap in [`../../docs/finops-kb-review.md`](../../docs/finops-kb-review.md) §6).
 
